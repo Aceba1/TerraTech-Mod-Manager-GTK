@@ -1,0 +1,708 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<stetic-interface>
+  <configuration>
+    <images-root-path>..</images-root-path>
+    <target-gtk-version>2.12</target-gtk-version>
+  </configuration>
+  <import>
+    <widget-library name="../bin/Debug/TerraTechModManager-GTK.exe" internal="true" />
+    <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+  </import>
+  <widget class="Gtk.Window" id="MainWindow" design-size="822 431">
+    <action-group name="Default">
+      <action id="FileAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">File</property>
+        <property name="ShortLabel" translatable="yes">File</property>
+      </action>
+      <action id="ConfigAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Config</property>
+        <property name="ShortLabel" translatable="yes">Config</property>
+      </action>
+      <action id="HelpAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Help</property>
+        <property name="ShortLabel" translatable="yes">Help</property>
+      </action>
+      <action id="FileAction1">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">File</property>
+        <property name="ShortLabel" translatable="yes">File</property>
+      </action>
+      <action id="ConfigAction1">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Config</property>
+        <property name="ShortLabel" translatable="yes">Config</property>
+      </action>
+      <action id="HelpAction1">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Help</property>
+        <property name="ShortLabel" translatable="yes">Help</property>
+      </action>
+      <action id="InstallPatchAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Install Patch</property>
+        <property name="ShortLabel" translatable="yes">Install Patch</property>
+        <signal name="Activated" handler="UserInstallPatch" />
+      </action>
+      <action id="RemovePatchAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Remove Patch</property>
+        <property name="ShortLabel" translatable="yes">Remove Patch</property>
+        <signal name="Activated" handler="UserRemovePatch" />
+      </action>
+      <action id="DownloadLatestPatcherAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Download Latest Patcher</property>
+        <property name="ShortLabel" translatable="yes">Download Latest Patcher</property>
+        <signal name="Activated" handler="UserUpdatePatch" />
+      </action>
+      <action id="LookForTTMMUpdateAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Look for TTMM Update</property>
+        <property name="ShortLabel" translatable="yes">Look for TTMM Update</property>
+        <signal name="Activated" handler="UserUpdateTTMM" />
+      </action>
+      <action id="DownloadAllModUpdatesAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Download All Mod Updates</property>
+        <property name="ShortLabel" translatable="yes">Download All Mod Updates</property>
+        <signal name="Activated" handler="TryDownloadAllModUpdates" />
+      </action>
+      <action id="ShowLogAction">
+        <property name="Type">Toggle</property>
+        <property name="Label" translatable="yes">Show Log</property>
+        <property name="ShortLabel" translatable="yes">Show Log</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">False</property>
+      </action>
+      <action id="SkipStartAction">
+        <property name="Type">Toggle</property>
+        <property name="Label" translatable="yes">Skip Start</property>
+        <property name="ShortLabel" translatable="yes">Skip Start</property>
+        <property name="DrawAsRadio">False</property>
+        <property name="Active">False</property>
+        <signal name="Toggled" handler="ChangeSkipStart" />
+      </action>
+      <action id="SetGithubTokenAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Set Github Token</property>
+        <property name="ShortLabel" translatable="yes">Set Github Token</property>
+        <signal name="Activated" handler="SetGithubToken_Clicked" />
+      </action>
+      <action id="TTMMGithubPageAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">TTMM Github Page</property>
+        <property name="ShortLabel" translatable="yes">TTMM Github Page</property>
+        <signal name="Activated" handler="OpenGithubPage" />
+      </action>
+      <action id="TTMMForumPageAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">TTMM Forum Page</property>
+        <property name="ShortLabel" translatable="yes">TTMM Forum Page</property>
+        <signal name="Activated" handler="OpenForumPage" />
+      </action>
+      <action id="TTMMWikiPageAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">TTMM Wiki Page</property>
+        <property name="ShortLabel" translatable="yes">TTMM Wiki Page</property>
+        <signal name="Activated" handler="OpenWikiPage" />
+      </action>
+      <action id="GithubReleasesAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Github Releases</property>
+        <property name="ShortLabel" translatable="yes">Github Releases</property>
+      </action>
+    </action-group>
+    <property name="MemberName" />
+    <property name="Title" translatable="yes">TerraTech Mod Manager</property>
+    <property name="Icon">resource:TerraTechModManagerGTK.Big TTMM Logo.png</property>
+    <property name="WindowPosition">CenterOnParent</property>
+    <signal name="DeleteEvent" handler="OnDeleteEvent" />
+    <child>
+      <widget class="Gtk.VBox" id="vbox1">
+        <property name="MemberName" />
+        <property name="Spacing">3</property>
+        <child>
+          <widget class="Gtk.HBox" id="hbox4">
+            <property name="MemberName" />
+            <property name="Spacing">6</property>
+            <child>
+              <widget class="Gtk.MenuBar" id="menubar1">
+                <property name="MemberName" />
+                <node name="menubar1" type="Menubar">
+                  <node type="Menu" action="FileAction1">
+                    <node type="Menuitem" action="InstallPatchAction" />
+                    <node type="Menuitem" action="RemovePatchAction" />
+                    <node type="Menuitem" action="DownloadLatestPatcherAction" />
+                    <node type="Menuitem" action="LookForTTMMUpdateAction" />
+                    <node type="Menuitem" action="DownloadAllModUpdatesAction" />
+                  </node>
+                  <node type="Menu" action="ConfigAction1">
+                    <node type="Menuitem" action="SkipStartAction" />
+                    <node type="Menuitem" action="SetGithubTokenAction" />
+                  </node>
+                  <node type="Menu" action="HelpAction1">
+                    <node type="Menuitem" action="TTMMGithubPageAction" />
+                    <node type="Menuitem" action="TTMMForumPageAction" />
+                    <node type="Menuitem" action="TTMMWikiPageAction" />
+                  </node>
+                </node>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">False</property>
+                <property name="Expand">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Label" id="labelCurrentTask">
+                <property name="MemberName" />
+                <property name="Xalign">1</property>
+                <property name="LabelProp" translatable="yes">Idle</property>
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+                <property name="AutoSize">False</property>
+                <property name="Padding">5</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">0</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.HBox" id="hbox2">
+            <property name="MemberName" />
+            <property name="Spacing">6</property>
+            <property name="BorderWidth">5</property>
+            <child>
+              <widget class="Gtk.Label" id="labelFind">
+                <property name="MemberName" />
+                <property name="LabelProp" translatable="yes">Find</property>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Entry" id="entryModSearch">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="IsEditable">True</property>
+                <property name="InvisibleChar">•</property>
+                <signal name="Activated" handler="EntryModSearchActivated" />
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+                <property name="AutoSize">True</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Button" id="buttonSearchMods">
+                <property name="MemberName" />
+                <property name="Visible">False</property>
+                <property name="CanFocus">True</property>
+                <property name="Type">TextOnly</property>
+                <property name="Label" translatable="yes">Continue</property>
+                <property name="UseUnderline">True</property>
+                <signal name="Clicked" handler="ButtonSearchModsClicked" />
+              </widget>
+              <packing>
+                <property name="Position">2</property>
+                <property name="AutoSize">False</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">1</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.Notebook" id="TabPagerMods">
+            <property name="MemberName" />
+            <property name="CanFocus">True</property>
+            <property name="CurrentPage">0</property>
+            <signal name="SwitchPage" handler="TabChanged" />
+            <child>
+              <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow1">
+                <property name="MemberName" />
+                <property name="ShadowType">In</property>
+                <child>
+                  <widget class="Gtk.TreeView" id="treeviewLocalMods">
+                    <property name="MemberName" />
+                    <property name="CanFocus">True</property>
+                    <property name="ShowScrollbars">True</property>
+                    <property name="SearchColumn">1</property>
+                  </widget>
+                </child>
+              </widget>
+            </child>
+            <child>
+              <widget class="Gtk.Label" id="tabLabelLocalMods">
+                <property name="MemberName" />
+                <property name="LabelProp" translatable="yes">Installed Mods</property>
+              </widget>
+              <packing>
+                <property name="type">tab</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
+                <property name="MemberName" />
+                <property name="ShadowType">In</property>
+                <child>
+                  <widget class="Gtk.TreeView" id="treeviewGithubMods">
+                    <property name="MemberName" />
+                    <property name="CanFocus">True</property>
+                    <property name="ShowScrollbars">True</property>
+                    <property name="SearchColumn">1</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Label" id="tabLabelGithubMods">
+                <property name="MemberName" />
+                <property name="LabelProp" translatable="yes">Github Mods</property>
+              </widget>
+              <packing>
+                <property name="type">tab</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">2</property>
+            <property name="AutoSize">True</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.VBox" id="ModInfoVBox">
+            <property name="MemberName" />
+            <property name="Visible">False</property>
+            <property name="Spacing">6</property>
+            <child>
+              <widget class="Gtk.VBox" id="vbox3">
+                <property name="MemberName" />
+                <property name="Spacing">6</property>
+                <child>
+                  <widget class="Gtk.Label" id="labelModTitle">
+                    <property name="MemberName" />
+                    <property name="LabelProp" translatable="yes">&lt;b&gt;Name&lt;/b&gt;</property>
+                    <property name="UseMarkup">True</property>
+                  </widget>
+                  <packing>
+                    <property name="Position">0</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.HBox" id="hbox1">
+                    <property name="MemberName" />
+                    <property name="Spacing">6</property>
+                    <child>
+                      <widget class="Gtk.Label" id="labelModDesc">
+                        <property name="MemberName" />
+                        <property name="Xalign">0</property>
+                        <property name="LabelProp" translatable="yes">An inline description of the selected mod</property>
+                        <property name="Wrap">True</property>
+                      </widget>
+                      <packing>
+                        <property name="Position">0</property>
+                        <property name="AutoSize">False</property>
+                        <property name="Padding">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="Gtk.Label" id="labelModLink">
+                        <property name="MemberName" />
+                        <property name="CanFocus">True</property>
+                        <property name="Xalign">1</property>
+                        <property name="LabelProp" translatable="yes">Link</property>
+                        <property name="UseUnderline">True</property>
+                        <property name="Selectable">True</property>
+                      </widget>
+                      <packing>
+                        <property name="Position">1</property>
+                        <property name="AutoSize">True</property>
+                        <property name="Expand">False</property>
+                        <property name="Fill">False</property>
+                        <property name="Padding">5</property>
+                      </packing>
+                    </child>
+                  </widget>
+                  <packing>
+                    <property name="Position">1</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.HBox" id="hbox3">
+                <property name="MemberName" />
+                <property name="Spacing">6</property>
+                <property name="BorderWidth">5</property>
+                <child>
+                  <widget class="Gtk.ComboBox" id="comboboxModState">
+                    <property name="MemberName" />
+                    <property name="IsTextCombo">True</property>
+                    <property name="Items" translatable="yes">Enabled
+Inactive
+Disabled</property>
+                    <property name="Active">2</property>
+                    <signal name="Changed" handler="SetModState" />
+                  </widget>
+                  <packing>
+                    <property name="Position">0</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Button" id="buttonModDownload">
+                    <property name="MemberName" />
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextOnly</property>
+                    <property name="Label" translatable="yes">Download Mod</property>
+                    <property name="UseUnderline">True</property>
+                    <signal name="Clicked" handler="GetModFromCloud" />
+                  </widget>
+                  <packing>
+                    <property name="Position">1</property>
+                    <property name="AutoSize">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Button" id="buttonModInfo">
+                    <property name="MemberName" />
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextOnly</property>
+                    <property name="Label" translatable="yes">Description</property>
+                    <property name="UseUnderline">True</property>
+                    <signal name="Activated" handler="ModDescPreviewer" />
+                  </widget>
+                  <packing>
+                    <property name="Position">2</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <widget class="Gtk.Button" id="buttonModRemove">
+                    <property name="MemberName" />
+                    <property name="CanFocus">True</property>
+                    <property name="Type">TextOnly</property>
+                    <property name="Label" translatable="yes">Delete Mod</property>
+                    <property name="UseUnderline">True</property>
+                    <signal name="Clicked" handler="DeleteLocalMod" />
+                  </widget>
+                  <packing>
+                    <property name="Position">3</property>
+                    <property name="AutoSize">True</property>
+                    <property name="Expand">False</property>
+                    <property name="Fill">False</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">3</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="Gtk.Window" id="TerraTechModManagerGTK.Start" design-size="641 402">
+    <property name="MemberName" />
+    <property name="Title" translatable="yes">TerraTech Mod Manager - Start</property>
+    <property name="Icon">resource:TerraTechModManagerGTK.Big TTMM Logo.png</property>
+    <property name="WindowPosition">CenterOnParent</property>
+    <child>
+      <widget class="Gtk.VBox" id="vbox2">
+        <property name="MemberName" />
+        <child>
+          <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
+            <property name="MemberName" />
+            <property name="HscrollbarPolicy">Never</property>
+            <property name="ShadowType">In</property>
+            <property name="BorderWidth">5</property>
+            <child>
+              <widget class="Gtk.TextView" id="textviewNotes">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="ShowScrollbars">True</property>
+                <property name="Editable">False</property>
+                <property name="Text" translatable="yes">A few things to note:
+
+ - This program connects to Github to aquire mods, the patcher, and updates.
+ - If not present when booting, the program will download the patcher from Github.
+ - Loading the program will make sure that the modloader (TTQMM) is present in the game.
+    - The modloader can be removed from the game from within this program's File menu.
+
+Updating or reinstalling the game will remove the modloader and stop mods from loading.
+You can reinstall the patch by loading TTMM again.
+
+If you encounter the Github API throttling error, you can create a token to bypass it here: 
+https://github.com/settings/tokens
+
+If you have any problems, please contact the creator on the Github,  TerraTech Forum, or on the official TerraTech Discord (https://discord.gg/TerraTechGame)</property>
+                <property name="WrapMode">WordChar</property>
+              </widget>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">0</property>
+            <property name="AutoSize">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.HBox" id="hbox1">
+            <property name="MemberName" />
+            <property name="Spacing">6</property>
+            <child>
+              <widget class="Gtk.Label" id="labelFileSelect">
+                <property name="MemberName" />
+                <property name="Xalign">1</property>
+                <property name="LabelProp" translatable="yes">     Path</property>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Entry" id="entryFileSelect">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="Text" translatable="yes">/TerraTech installation folder/</property>
+                <property name="IsEditable">True</property>
+                <property name="InvisibleChar">•</property>
+              </widget>
+              <packing>
+                <property name="PackType">End</property>
+                <property name="Position">1</property>
+                <property name="AutoSize">True</property>
+                <property name="Padding">5</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">1</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.HBox" id="hbox2">
+            <property name="MemberName" />
+            <property name="Spacing">6</property>
+            <child>
+              <widget class="Gtk.Label" id="labelTip">
+                <property name="MemberName" />
+                <property name="Xalign">1</property>
+                <property name="UseMarkup">True</property>
+                <property name="UseUnderline">True</property>
+                <property name="Wrap">True</property>
+                <property name="Justify">Right</property>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Button" id="buttonStart">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="Type">TextOnly</property>
+                <property name="Label" translatable="yes">   Continue   </property>
+                <property name="UseUnderline">True</property>
+                <signal name="Clicked" handler="OpenMain_Clicked" />
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+                <property name="AutoSize">False</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+                <property name="Padding">5</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">2</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+            <property name="Padding">5</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="Gtk.Dialog" id="TerraTechModManagerGTK.DialogGithubToken" design-size="313 156">
+    <property name="MemberName" />
+    <property name="Title" translatable="yes">TerraTech Mod Manager - Token</property>
+    <property name="Icon">resource:TerraTechModManagerGTK.Big TTMM Logo.png</property>
+    <property name="TypeHint">Dialog</property>
+    <property name="WindowPosition">CenterOnParent</property>
+    <property name="Buttons">2</property>
+    <property name="HelpButton">False</property>
+    <child internal-child="VBox">
+      <widget class="Gtk.VBox" id="dialog1_VBox">
+        <property name="MemberName" />
+        <property name="BorderWidth">2</property>
+        <child>
+          <widget class="Gtk.VBox" id="vbox2">
+            <property name="MemberName" />
+            <property name="Spacing">6</property>
+            <child>
+              <widget class="Gtk.Frame" id="frame1">
+                <property name="MemberName" />
+                <property name="ShadowType">None</property>
+                <child>
+                  <widget class="Gtk.Alignment" id="GtkAlignment2">
+                    <property name="MemberName" />
+                    <property name="Xalign">0</property>
+                    <property name="Yalign">0</property>
+                    <property name="LeftPadding">12</property>
+                    <child>
+                      <widget class="Gtk.Entry" id="entryGithubKey">
+                        <property name="MemberName" />
+                        <property name="CanFocus">True</property>
+                        <property name="IsEditable">True</property>
+                        <property name="InvisibleChar">•</property>
+                      </widget>
+                    </child>
+                  </widget>
+                </child>
+                <child>
+                  <widget class="Gtk.Label" id="GtkLabel2">
+                    <property name="MemberName" />
+                    <property name="LabelProp" translatable="yes">&lt;b&gt;Github Token&lt;/b&gt;</property>
+                    <property name="UseMarkup">True</property>
+                  </widget>
+                  <packing>
+                    <property name="type">label_item</property>
+                  </packing>
+                </child>
+              </widget>
+              <packing>
+                <property name="Position">0</property>
+                <property name="AutoSize">True</property>
+                <property name="Expand">False</property>
+                <property name="Fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="Gtk.Label" id="label1">
+                <property name="MemberName" />
+                <property name="Xpad">6</property>
+                <property name="Xalign">0</property>
+                <property name="LabelProp" translatable="yes">You can make a token for TTMM here:
+https://github.com/settings/tokens</property>
+                <property name="Wrap">True</property>
+                <property name="Selectable">True</property>
+              </widget>
+              <packing>
+                <property name="Position">1</property>
+                <property name="AutoSize">False</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">0</property>
+            <property name="AutoSize">True</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+    <child internal-child="ActionArea">
+      <widget class="Gtk.HButtonBox" id="dialog1_ActionArea">
+        <property name="MemberName" />
+        <property name="Spacing">10</property>
+        <property name="BorderWidth">5</property>
+        <property name="Size">2</property>
+        <property name="LayoutStyle">End</property>
+        <child>
+          <widget class="Gtk.Button" id="buttonCancel">
+            <property name="MemberName" />
+            <property name="CanDefault">True</property>
+            <property name="CanFocus">True</property>
+            <property name="UseStock">True</property>
+            <property name="Type">StockItem</property>
+            <property name="StockId">gtk-cancel</property>
+            <property name="ResponseId">-6</property>
+            <signal name="Clicked" handler="DestroyDialog" />
+            <property name="label">gtk-cancel</property>
+          </widget>
+          <packing>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.Button" id="buttonOk">
+            <property name="MemberName" />
+            <property name="CanDefault">True</property>
+            <property name="CanFocus">True</property>
+            <property name="UseStock">True</property>
+            <property name="Type">StockItem</property>
+            <property name="StockId">gtk-ok</property>
+            <property name="ResponseId">-5</property>
+            <signal name="Clicked" handler="Dialog_Accepted" />
+            <property name="label">gtk-ok</property>
+          </widget>
+          <packing>
+            <property name="Position">1</property>
+            <property name="Expand">False</property>
+            <property name="Fill">False</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
+</stetic-interface>

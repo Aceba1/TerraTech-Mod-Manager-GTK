@@ -1,0 +1,452 @@
+﻿using System;
+using System.Diagnostics;
+using System.Net;
+using Gtk;
+using TerraTechModManagerGTK;
+using TerraTechModManagerGTK.Downloader;
+
+public partial class MainWindow : Gtk.Window
+{
+    public static ListStore ModListStoreLocal;
+    public static ListStore ModListStoreGithub;
+    //private TreeIter TGithubIter;
+    //private TreeIter TLocalIter;
+
+    public static MainWindow inst;
+
+    private DialogGithubToken _dialogGithubToken;
+
+    public MainWindow() : base(Gtk.WindowType.Toplevel)
+    {
+        //Kill running QModManager processes, if there are any
+        foreach (var k in System.Diagnostics.Process.GetProcessesByName("QModManager")) k.Kill();
+
+        Build();
+        SetupTree();
+        SkipStartAction.Active = ConfigHandler.CacheValue("skipstart", false);
+        inst = this;
+        ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)0x0FF0; //System.Net.SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
+        Tasks.AddToTaskQueue(new System.Threading.Tasks.Task(InstallModLoader));
+        Tasks.AddToTaskQueue(new System.Threading.Tasks.Task(GetLocalMods));
+        Tasks.AddToTaskQueue(new System.Threading.Tasks.Task(GetGithubMods));
+    }
+
+    private void InstallModLoader()
+    {
+        try
+        {
+            string ManagedFolder = System.IO.Path.Combine(ModInfoTools.DataFolder, "Managed");
+            Patcher.PathToExe = System.IO.Path.Combine(ManagedFolder, "QModManager.exe");
+
+            if (!System.IO.File.Exists(Patcher.PathToExe))
+            {
+                Patcher.UpdatePatcher(ManagedFolder);
+                Patcher.RunExe("-i");
+            }
+            else if (ConfigHandler.CacheValue("lastpatchversion", "0.0.0") != Tools.Version_Number)
+            {
+                Patcher.UpdatePatcher(ManagedFolder);
+                Patcher.RunExe("-u");
+                Patcher.IsReinstalling = true;
+            }
+            else
+            {
+                Patcher.RunExe("-i");
+            }
+            ConfigHandler.SetValue("lastpatchversion", Tools.Version_Number);
+        }
+        catch (Exception E)
+        {
+            Log("Unable to use patcher! Game may not load mods!\n" + E.Message);
+        }
+    }
+
+    private void GetGithubMods()
+    {
+        try
+        {
+            Log("Finding Github mods...");
+            buttonSearchMods.Visible = ModInfoTools.GetFirstGithubMods(ModListStoreGithub);
+        }
+        catch (Exception E)
+        {
+            Log("Unable to get Github mods!\n" + E.Message);
+        }
+    }
+    private void GetMoreGithubMods()
+    {
+        try
+        {
+            Log("Finding more Github mods...");
+            buttonSearchMods.Visible = ModInfoTools.GetMoreGithubMods(ModListStoreGithub);
+        }
+        catch (Exception E)
+        {
+            Log("Unable to get Github mods!\n" + E.Message);
+        }
+    }
+    private void GetLocalMods()
+    {
+        Log("Finding local mods...");
+        ModInfoTools.GetLocalMods(ModListStoreLocal);
+    }
+
+    private TreeViewColumn AddColumn(string ColumnTitle, TreeView TreeView, CellRenderer NewRenderer, string Attribute, int Index)
+    {
+        var Column = new TreeViewColumn
+        {
+            Title = ColumnTitle
+        };
+        TreeView.AppendColumn(Column);
+        Column.PackStart(NewRenderer, true);
+        Column.AddAttribute(NewRenderer, Attribute, Index);
+        return Column;
+    }
+    //sudo write (Despacito) 
+
+    private void SetupTree()
+    {
+        treeviewLocalMods.Selection.Changed += TreeView_SelectionChanged;
+
+        var SC = AddColumn("Active", treeviewLocalMods, new CellRendererToggle(), "active", 0);
+        SC.Clickable = true; SC.Clicked += StateColumn_Clicked;
+        AddColumn("Name", treeviewLocalMods, new CellRendererText(), "markup", 1);
+        AddColumn("Description", treeviewLocalMods, new CellRendererText(), "text", 2);
+        AddColumn("Author", treeviewLocalMods, new CellRendererText(), "text", 3);
+        ModListStoreLocal = new ListStore(typeof(bool), typeof(string), typeof(string), typeof(string), typeof(ModInfoHolder));
+
+        treeviewLocalMods.Model = ModListStoreLocal;
+
+
+        treeviewGithubMods.Selection.Changed += TreeView_SelectionChanged;
+
+        SC = AddColumn("Installed", treeviewGithubMods, new CellRendererToggle(), "active", 0);
+        SC.Clickable = true; SC.Clicked += StateColumn_Clicked;
+        AddColumn("Name", treeviewGithubMods, new CellRendererText(), "markup", 1);
+        AddColumn("Description", treeviewGithubMods, new CellRendererText(), "text", 2);
+        AddColumn("Author", treeviewGithubMods, new CellRendererText(), "text", 3);
+        ModListStoreGithub = new ListStore(typeof(bool), typeof(string), typeof(string), typeof(string), typeof(ModInfoHolder));
+
+        treeviewGithubMods.Model = ModListStoreGithub;
+    }
+
+    TreeView CurrentTreeView
+    {
+        get
+        {
+            switch (TabPagerMods.Page)
+            {
+                case 0: return treeviewLocalMods;
+                case 1: return treeviewGithubMods;
+                default: return null;
+            }
+        }
+    }
+
+    protected void OnDeleteEvent(object sender, DeleteEventArgs a)
+    {
+        ConfigHandler.SaveConfig();
+        Tasks.ClearTasks();
+        DownloadFolder.KillDownload = 1;
+        Application.Quit();
+
+        //Kill running QModManager processes, if there are any
+        foreach (var k in System.Diagnostics.Process.GetProcessesByName("QModManager")) k.Kill();
+
+        a.RetVal = true;
+    }
+
+
+
+    public void Log(string CurrentState)
+    {
+        labelCurrentTask.Text = CurrentState;
+        Console.WriteLine(CurrentState);
+    }
+
+    protected void SetGithubToken_Clicked(object sender, EventArgs e)
+    {
+        if (_dialogGithubToken == null) _dialogGithubToken = new DialogGithubToken();
+        else _dialogGithubToken.ActivateFocus();
+        _dialogGithubToken.Destroyed += SetGithubToken_Clear;
+        _dialogGithubToken.Show();
+    }
+
+    private void SetGithubToken_Clear(object sender, EventArgs e)
+    {
+        _dialogGithubToken = null;
+    }
+
+    void StateColumn_Clicked(object sender, EventArgs e)
+    {
+        CurrentTreeView.Selection.GetSelected(out var iter);
+    }
+
+    private void TreeView_SelectionChanged(object sender, EventArgs e)
+    {
+        bool flag = CurrentTreeView.Selection.CountSelectedRows() != 0;
+        ModInfoVBox.Visible = flag;
+        if (flag)
+        {
+            UpdateModInfoUI(GetModInfoFromSelected());
+        }
+    }
+
+    private void UpdateModInfoUI(ModInfoHolder modInfo)
+    {
+        labelModTitle.Markup = "<b>" + modInfo.FancyName() + "</b>";
+        labelModLink.Text = modInfo.Site;
+        labelModDesc.Text = modInfo.InlineDescription;
+        if (TabPagerMods.CurrentPage == 0)
+        {
+            comboboxModState.Visible = true;
+            buttonModDownload.Label = "Update";
+            buttonModRemove.Visible = true;
+
+            comboboxModState.Active = (int)modInfo.State;
+        }
+        else
+        {
+            comboboxModState.Visible = false;
+            buttonModDownload.Label = "Download";
+            buttonModRemove.Visible = false;
+        }
+    }
+
+    private ModInfoHolder GetModInfoFromSelected()
+    {
+        CurrentTreeView.Selection.GetSelected(out var iter);
+        return GetModInfoFromIter(iter);
+    }
+    private ModInfoHolder GetModInfoFromIter(TreeIter Row)
+    {
+        switch (TabPagerMods.CurrentPage)
+        {
+            case 0: return (ModInfoHolder)ModListStoreLocal.GetValue(Row, (int)TreeColumnInfo.ModInfo);
+            case 1: return (ModInfoHolder)ModListStoreGithub.GetValue(Row, (int)TreeColumnInfo.ModInfo);
+            default: return null;
+        }
+    }
+
+    protected void EntryModSearchActivated(object sender, EventArgs e)
+    {
+        Log("That button doesn't do anything yet, sorry");
+    }
+
+    protected void ButtonSearchModsClicked(object sender, EventArgs e)
+    {
+        Log("That button doesn't do anything yet, sorry");
+    }
+
+    protected void ChangeSkipStart(object o, EventArgs args)
+    {
+        ConfigHandler.SetValue("skipstart", SkipStartAction.Active);
+    }
+
+    protected void GetModFromCloud(object sender, EventArgs e)
+    {
+        var modInfo = GetModInfoFromSelected();
+        if (TabPagerMods.CurrentPage != 0)
+        {
+            if (modInfo.FoundOther == 1)
+            {
+                var localMod = ModInfoTools.LocalMods[modInfo.Name];
+                if (localMod.State == ModInfoHolder.ModState.Disabled)
+                {
+                    Log("Can't update a disabled mod!");
+                    return;
+                }
+                if (ModDownloader.AddModDownload(modInfo, ModListStoreGithub))
+                {
+                    ModListStoreLocal.SetValue(localMod.TreeIter, (int)TreeColumnInfo.Desc, "Updating...");
+                }
+                return;
+            }
+            ModDownloader.AddModDownload(modInfo, ModListStoreGithub);
+            return;
+        }
+        if (!string.IsNullOrEmpty(modInfo.CloudName))
+        {
+            if (modInfo.FoundOther == 0)
+            {
+                try
+                {
+                    var repoItem = GetRepos.GetOneRepo(modInfo.CloudName);
+                }
+                catch
+                {
+                    Log("Could not locate server mod!");
+                    modInfo.FoundOther = -1;
+                    return;
+                }
+            }
+            if (ModInfoTools.GithubMods.TryGetValue(modInfo.CloudName, out ModInfoHolder cloudModInfo))
+            {
+                if (modInfo.State == ModInfoHolder.ModState.Disabled)
+                {
+                    Log("Can't update a disabled mod!");
+                    return;
+                }
+                if (ModDownloader.AddModDownload(cloudModInfo, ModListStoreGithub))
+                {
+                    ModListStoreLocal.SetValue(modInfo.TreeIter, (int)TreeColumnInfo.Desc, "Updating...");
+                    return;
+                }
+            }
+        }
+        Log("Can't download mod!");
+    }
+
+    protected void SetModState(object sender, EventArgs e)
+    {
+        if (TabPagerMods.CurrentPage != 0) return;
+        var modInfo = GetModInfoFromSelected();
+        var newState = (ModInfoHolder.ModState)comboboxModState.Active;
+        SetModState(modInfo, newState);
+    }
+
+    private void SetModState(ModInfoHolder modInfo, ModInfoHolder.ModState newState)
+    {
+        if (newState == modInfo.State)
+            return;
+        if (modInfo.State == ModInfoHolder.ModState.Disabled)
+        {
+            SetLocalModDisabled(ref modInfo.FilePath, false);
+        }
+        modInfo.State = newState;
+        ModListStoreLocal.SetValue(modInfo.TreeIter, (int)TreeColumnInfo.State, newState == ModInfoHolder.ModState.Enabled);
+        if (newState == ModInfoHolder.ModState.Disabled)
+        {
+            SetLocalModDisabled(ref modInfo.FilePath, true);
+            Log("Relocated " + modInfo.FancyName());
+            return;
+        }
+        modInfo.EditModJson("Enable", modInfo.State == ModInfoHolder.ModState.Enabled);
+        if (newState == ModInfoHolder.ModState.Enabled)
+        {
+            Log("Activated " + modInfo.FancyName() + (EnableDependencies(modInfo) ? " and dependencies" : ""));
+        }
+        else if (newState == ModInfoHolder.ModState.Inactive)
+        {
+            Log("Deactivated " + modInfo.FancyName());
+        }
+    }
+
+    internal void SetLocalModDisabled(ref string path, bool Disable)
+    {
+        string newPath = ModInfoTools.RootFolder + @"/QMods" + (Disable ? @"-Disabled/" : @"/") + new System.IO.DirectoryInfo(path).Name;
+        System.IO.Directory.Move(path, newPath);
+        path = newPath;
+    }
+
+    private bool EnableDependencies(ModInfoHolder mod)
+    {
+        bool result = false;
+        foreach (string dependency in mod.RequiredModNames)
+        {
+            if (ModInfoTools.LocalMods.TryGetValue(dependency.Substring(dependency.LastIndexOf('/') + 1), out ModInfoHolder modDependency))
+            {
+                if (modDependency.State != ModInfoHolder.ModState.Enabled)
+                {
+                    SetModState(modDependency, ModInfoHolder.ModState.Enabled);
+                    result = true;
+                }
+            }
+        }
+        return result;
+    }
+
+    protected void DeleteLocalMod(object sender, EventArgs e)
+    {
+        var modToDelete = GetModInfoFromSelected();
+        Log("Deleting " + modToDelete.Name + "...");
+        if (modToDelete.FoundOther == 1 && ModInfoTools.GithubMods.TryGetValue(modToDelete.CloudName, out ModInfoHolder cloudModInfo))
+        {
+            ModListStoreGithub.SetValue(cloudModInfo.TreeIter, (int)TreeColumnInfo.State, false);
+        }
+        if ((string)ModListStoreLocal.GetValue(modToDelete.TreeIter, (int)TreeColumnInfo.Desc) == "Updating...")
+        {
+            if (ModDownloader.Downloads[0].CloudName == modToDelete.CloudName)
+            {
+                Log("Killing update process for " + modToDelete.Name + "...");
+                DownloadFolder.KillDownload = 2;
+            }
+            else
+            {
+                ModDownloader.Downloads.Remove(ModInfoTools.GithubMods[modToDelete.CloudName]);
+                System.IO.Directory.Delete(modToDelete.FilePath, true);
+                Log("Cancelled update; Deleted " + modToDelete.Name + "...");
+            }
+        }
+        else
+        {
+            System.IO.Directory.Delete(modToDelete.FilePath, true);
+            Log("Deleted " + modToDelete.Name + "...");
+        }
+        ModInfoTools.LocalMods.Remove(modToDelete.Name);
+        if (modToDelete.CloudName != null && ModInfoTools.GithubMods.TryGetValue(modToDelete.CloudName, out ModInfoHolder cloudMod))
+        {
+            cloudMod.FoundOther = 0;
+            ModListStoreGithub.SetValue(cloudMod.TreeIter, (int)TreeColumnInfo.State, false);
+        }
+        ModListStoreLocal.Remove(ref modToDelete.TreeIter);
+        treeviewLocalMods.Selection.UnselectAll();
+    }
+
+    protected void TryDownloadAllModUpdates(object sender, EventArgs e)
+    {
+        Log("That button doesn't do anything yet, sorry");
+    }
+
+    protected void OpenGithubPage(object sender, EventArgs e)
+    {
+        Process.Start("https://github.com/Aceba1/TerraTech-Mod-Manager-GTK");
+    }
+
+    protected void OpenForumPage(object sender, EventArgs e)
+    {
+        Process.Start("https://forum.terratechgame.com/index.php?threads/terratech-mod-manager.17208/");
+    }
+
+    protected void OpenWikiPage(object sender, EventArgs e)
+    {
+        Process.Start("https://terratech.gamepedia.com/TerraTech_Mod_Manager");
+    }
+
+    protected void TabChanged(object o, SwitchPageArgs args)
+    {
+        TreeView_SelectionChanged(o, args);
+    }
+
+    protected void UserInstallPatch(object sender, EventArgs e)
+    {
+        Patcher.RunByUser = true;
+        Patcher.RunExe("-i");
+    }
+
+    protected void UserRemovePatch(object sender, EventArgs e)
+    {
+        Patcher.RunByUser = true;
+        Patcher.RunExe("-u");
+    }
+
+    protected void UserUpdatePatch(object sender, EventArgs e)
+    {
+        Patcher.RunByUser = false;
+        Patcher.UpdatePatcher(System.IO.Path.Combine(ModInfoTools.DataFolder, "Managed"));
+        Patcher.RunExe("-u");
+        Patcher.IsReinstalling = true;
+
+        ConfigHandler.SetValue("lastpatchversion", Tools.Version_Number);
+    }
+
+    protected void UserUpdateTTMM(object sender, EventArgs e)
+    {
+        Log("That button doesn't do anything yet, sorry");
+    }
+
+    protected void ModDescPreviewer(object sender, EventArgs e)
+    {
+    }
+}
