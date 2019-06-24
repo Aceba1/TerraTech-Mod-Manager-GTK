@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using Newtonsoft.Json;
 
 namespace TerraTechModManagerGTK
@@ -12,13 +11,13 @@ namespace TerraTechModManagerGTK
 
         public static void ResetConfig()
         {
-            string path = AppDomain.CurrentDomain.BaseDirectory + "config.json";
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"config.json");
             File.Delete(path);
         }
 
         public static void LoadConfig()
         {
-            string path = AppDomain.CurrentDomain.BaseDirectory + "config.json";
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"config.json");
             if (File.Exists(path))
                 try
                 {
@@ -26,14 +25,14 @@ namespace TerraTechModManagerGTK
                 }
                 catch (Exception E)
                 {
-                    Console.WriteLine("There was an ERROR READING THE FRICKING CONFIG FILE WHAT THE HECK");
+                    Console.WriteLine("There was an error reading the config file!");
                     Console.WriteLine(E);
                     //NewMain.StartMessage += "There is a problem with the config.json file\n";
                 }
         }
         public static void SaveConfig()
         {
-            string path = AppDomain.CurrentDomain.BaseDirectory + "config.json";
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"config.json");
             File.WriteAllText(path, JsonConvert.SerializeObject(config));
         }
 

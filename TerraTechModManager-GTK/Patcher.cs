@@ -36,7 +36,7 @@ namespace TerraTechModManagerGTK
 
             patcher.StartInfo.UseShellExecute = false;
             patcher.StartInfo.RedirectStandardOutput = true;
-            patcher.StartInfo.CreateNoWindow = true;//true; //Change to true before releasing TTMM
+            patcher.StartInfo.CreateNoWindow = true;
             patcher.OutputDataReceived += HandlePatcher;
             try
             {

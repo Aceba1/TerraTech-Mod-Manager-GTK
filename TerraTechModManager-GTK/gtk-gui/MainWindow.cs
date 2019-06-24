@@ -412,7 +412,7 @@ public partial class MainWindow
 		this.TabPagerMods.SwitchPage += new global::Gtk.SwitchPageHandler(this.TabChanged);
 		this.comboboxModState.Changed += new global::System.EventHandler(this.SetModState);
 		this.buttonModDownload.Clicked += new global::System.EventHandler(this.GetModFromCloud);
-		this.buttonModInfo.Activated += new global::System.EventHandler(this.ModDescPreviewer);
+		this.buttonModInfo.Clicked += new global::System.EventHandler(this.ModDescPreviewer);
 		this.buttonModRemove.Clicked += new global::System.EventHandler(this.DeleteLocalMod);
 	}
 }

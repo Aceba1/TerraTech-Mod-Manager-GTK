@@ -103,7 +103,7 @@ namespace TerraTechModManagerGTK
 
         public string GetDescription()
         {
-            if (Description == null)
+            if (string.IsNullOrEmpty(Description))
             {
                 var client = new WebClient();
                 string descpath = "https://raw.githubusercontent.com/" + CloudName + "/master/DESC.";
@@ -137,7 +137,7 @@ namespace TerraTechModManagerGTK
                 }
                 else
                 {
-                    Description = "";
+                    Description = "No description could be found";
                 }
             }
             return Description;

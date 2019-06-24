@@ -135,6 +135,8 @@ If you have any problems, please contact the creator on the Github,  TerraTech F
 			this.DefaultWidth = 641;
 			this.DefaultHeight = 402;
 			this.Show();
+			this.DeleteEvent += new global::Gtk.DeleteEventHandler(this.OnDeleteEvent);
+			this.DestroyEvent += new global::Gtk.DestroyEventHandler(this.OnDestroyEvent);
 			this.buttonStart.Clicked += new global::System.EventHandler(this.OpenMain_Clicked);
 		}
 	}

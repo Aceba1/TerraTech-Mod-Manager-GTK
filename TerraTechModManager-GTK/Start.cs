@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Gtk;
 
 namespace TerraTechModManagerGTK
 {
@@ -13,14 +14,14 @@ namespace TerraTechModManagerGTK
             labelTip.Text = text_st;
             entryFileSelect.Text = Tools.TTRoot.Value;
             if (finished)
-                base.Hide();
+                base.Visible = false;//.Hide();
         }
 
         protected void OpenMain_Clicked(object sender, EventArgs e)
         {
             labelTip.Text = BootMain(entryFileSelect.Text);
             if (finished)
-                base.Hide();
+                base.Visible = false;//.Hide();
         }
 
         public static string BootMain(string path)
@@ -63,5 +64,20 @@ namespace TerraTechModManagerGTK
             return "";
         }
 
+        protected void OnDeleteEvent(object o, Gtk.DeleteEventArgs args)
+        {
+            Application.Quit();
+            Tools.AllowedToRun = false;
+            Environment.Exit(0);
+            //args.RetVal = true;
+        }
+
+        protected void OnDestroyEvent(object o, DestroyEventArgs args)
+        {
+            Application.Quit();
+            Tools.AllowedToRun = false;
+            Environment.Exit(0);
+            //args.RetVal = true;
+        }
     }
 }

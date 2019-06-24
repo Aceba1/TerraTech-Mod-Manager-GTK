@@ -13,7 +13,7 @@ namespace TerraTechModManagerGTK
     {
         public static class GetUpdateInfo
         {
-            public static GithubReleaseItem GetReleases(string CloudName)
+            public static GithubReleaseItem GetRelease(string CloudName)
             {
                 return WebClientHandler.DeserializeApiCall<GithubReleaseItem>("https://api.github.com/repos/" + CloudName + "/releases/latest");
             }
@@ -190,14 +190,14 @@ namespace TerraTechModManagerGTK
                 return result;
             }
 
-            private class GithubItem
+            public class GithubItem
             {
-                public string name;
-                public string url;
-                public string download_url;
-                public string path;
-                public long size;
-                public string type;
+                public string name = null;
+                public string url = null;
+                public string download_url = null;
+                public string path = null;
+                public long size = 0;
+                public string type = null;
             }
         }
 
@@ -306,7 +306,10 @@ namespace TerraTechModManagerGTK
                         serverMod.GetDescription();
                     System.IO.File.WriteAllText(System.IO.Path.Combine(Folder, "ttmm.json"), JsonConvert.SerializeObject(serverMod, Formatting.Indented));
                     ModInfoTools.GetLocalMod_Internal(Folder, false, true);
-                    MainWindow.ModListStoreGithub.SetValue(serverMod.TreeIter, (int)TreeColumnInfo.State, true);
+                    Tools.invoke.Add(delegate
+                    {
+                        MainWindow.ModListStoreGithub.SetValue(serverMod.TreeIter, (int)TreeColumnInfo.State, true);
+                    });
                     MainWindow.inst.Log("Done!");
                 }
                 catch (Exception e)

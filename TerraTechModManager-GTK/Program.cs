@@ -29,17 +29,30 @@ namespace TerraTechModManagerGTK
                 Start win = new Start();
                 win.Show();
             }
-            Application.Run();
+            while (Tools.AllowedToRun)
+            {
+                Application.RunIteration();
+                if (Tools.invoke.Count != 0)
+                {
+                    foreach (System.Action method in Tools.invoke)
+                        method?.Invoke();
+                    Tools.invoke.Clear();
+                }
+            }
         }
     }
 
     public static class Tools
     {
 #warning CHANGE 'Version_Number' WITH EVERY RELEASE
-        public const string Version_Number = "1.0.0";
+        public const string Version_Number = "0.1.0";
+
+        public const string GithubPage = "Aceba1/TerraTech-Mod-Manager-GTK";
 
         public static ConfigParam<string> GithubToken = new ConfigParam<string>("githubtoken", "");
         public static ConfigParam<string> TTRoot = new ConfigParam<string>("ttroot", GetUniqueRootPath());
+
+        public static List<System.Action> invoke = new List<System.Action>();
 
         public static bool IsLinux
         {
@@ -49,6 +62,8 @@ namespace TerraTechModManagerGTK
                 return (p == PlatformID.Unix) || (p == PlatformID.MacOSX) || (p == (PlatformID)128);
             }
         }
+
+        public static bool AllowedToRun { get; set; } = true;
 
         private static string GetUniqueRootPath()
         {

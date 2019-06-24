@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
+using System.Threading.Tasks;
 using Gtk;
 using TerraTechModManagerGTK;
 using TerraTechModManagerGTK.Downloader;
@@ -15,6 +16,7 @@ public partial class MainWindow : Gtk.Window
     public static MainWindow inst;
 
     private DialogGithubToken _dialogGithubToken;
+    private DialogDescription _dialogDescription;
 
     public MainWindow() : base(Gtk.WindowType.Toplevel)
     {
@@ -23,13 +25,21 @@ public partial class MainWindow : Gtk.Window
 
         Build();
         SetupTree();
+
         SkipStartAction.Active = ConfigHandler.CacheValue("skipstart", false);
         inst = this;
         ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)0x0FF0; //System.Net.SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
-        Tasks.AddToTaskQueue(new System.Threading.Tasks.Task(InstallModLoader));
-        Tasks.AddToTaskQueue(new System.Threading.Tasks.Task(GetLocalMods));
-        Tasks.AddToTaskQueue(new System.Threading.Tasks.Task(GetGithubMods));
+        Tasks.AddToTaskQueue(new Task(SleepForTime));
+        Tasks.AddToTaskQueue(new Task(GetLocalMods));
+        Tasks.AddToTaskQueue(new Task(UpdateProgram.V_LookForProgramUpdate));
+        Tasks.AddToTaskQueue(new Task(InstallModLoader));
+        Tasks.AddToTaskQueue(new Task(GetGithubMods));
+    }
+
+    private void SleepForTime()
+    {
+        System.Threading.Thread.Sleep(500);
     }
 
     private void InstallModLoader()
@@ -144,24 +154,27 @@ public partial class MainWindow : Gtk.Window
         }
     }
 
-    protected void OnDeleteEvent(object sender, DeleteEventArgs a)
+    public void CloseAll()
     {
         ConfigHandler.SaveConfig();
         Tasks.ClearTasks();
         DownloadFolder.KillDownload = 1;
         Application.Quit();
+        Tools.AllowedToRun = false;
 
         //Kill running QModManager processes, if there are any
         foreach (var k in System.Diagnostics.Process.GetProcessesByName("QModManager")) k.Kill();
+    }
 
+    protected void OnDeleteEvent(object sender, DeleteEventArgs a)
+    {
+        CloseAll();
         a.RetVal = true;
     }
 
-
-
     public void Log(string CurrentState)
     {
-        labelCurrentTask.Text = CurrentState;
+        Tools.invoke.Add(delegate { labelCurrentTask.Text = CurrentState; });
         Console.WriteLine(CurrentState);
     }
 
@@ -441,12 +454,28 @@ public partial class MainWindow : Gtk.Window
         ConfigHandler.SetValue("lastpatchversion", Tools.Version_Number);
     }
 
+
+
     protected void UserUpdateTTMM(object sender, EventArgs e)
     {
-        Log("That button doesn't do anything yet, sorry");
+        if (!UpdateProgram.LookForProgramUpdate())
+            Log("No program update is available");
     }
 
     protected void ModDescPreviewer(object sender, EventArgs e)
     {
+        if (_dialogDescription == null) _dialogDescription = new DialogDescription();
+        else _dialogDescription.ActivateFocus();
+        _dialogDescription.Destroyed += Description_Clear;
+        _dialogDescription.Show();
+        var modInfo = GetModInfoFromSelected();
+        _dialogDescription.Site = modInfo.Site;
+        _dialogDescription.Folder = modInfo.FilePath;
+        _dialogDescription.Set(TabPagerMods.CurrentPage != 0? DialogDescription.DescType.ServerModInfo : DialogDescription.DescType.LocalModInfo, modInfo.FancyName(), modInfo.GetDescription());
+    }
+
+    private void Description_Clear(object sender, EventArgs e)
+    {
+        _dialogDescription = null;
     }
 }

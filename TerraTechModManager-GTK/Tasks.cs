@@ -6,7 +6,7 @@ public static class Tasks
 {
     private static List<Task> TaskQueue = new List<Task>();
     
-    private static void CycleQueue(Task task)
+    private static void CycleQueue(Task obj)
     {
         TaskQueue.RemoveAt(0);
         int count = TaskQueue.Count;
@@ -18,8 +18,8 @@ public static class Tasks
 
     public static void AddToTaskQueue(Task task)
     {
-        task.ContinueWith(CycleQueue);
         TaskQueue.Add(task);
+        task.ContinueWith(CycleQueue);
         if (TaskQueue.Count == 1)
         {
             task.Start();
