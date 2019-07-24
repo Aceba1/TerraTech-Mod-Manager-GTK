@@ -305,7 +305,7 @@ namespace TerraTechModManagerGTK
                     if (serverMod.Description == null)
                         serverMod.GetDescription();
                     System.IO.File.WriteAllText(System.IO.Path.Combine(Folder, "ttmm.json"), JsonConvert.SerializeObject(serverMod, Formatting.Indented));
-                    ModInfoTools.GetLocalMod_Internal(Folder, false, true);
+                    ModInfoTools.GetLocalMod_Internal(Folder,/* false,*/ true);
                     Tools.invoke.Add(delegate
                     {
                         MainWindow.ModListStoreGithub.SetValue(serverMod.TreeIter, (int)TreeColumnInfo.State, true);

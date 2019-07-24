@@ -165,10 +165,10 @@ namespace TerraTechModManagerGTK
 
         public enum ModState : byte
         {
-            Enabled,
-            Inactive,
-            Disabled,
-            Server
+            Enabled = 0,
+            Inactive = 1,
+            //Disabled = 2,
+            Server = 3
         }
 
         public void EditModJson(string Parameter, object Value)

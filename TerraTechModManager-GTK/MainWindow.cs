@@ -26,6 +26,8 @@ public partial class MainWindow : Gtk.Window
         Build();
         SetupTree();
 
+        comboboxModState.RemoveText(1);
+
         SkipStartAction.Active = ConfigHandler.CacheValue("skipstart", false);
         inst = this;
         ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)0x0FF0; //System.Net.SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
@@ -265,11 +267,11 @@ public partial class MainWindow : Gtk.Window
             if (modInfo.FoundOther == 1)
             {
                 var localMod = ModInfoTools.LocalMods[modInfo.Name];
-                if (localMod.State == ModInfoHolder.ModState.Disabled)
-                {
-                    Log("Can't update a disabled mod!");
-                    return;
-                }
+                //if (localMod.State == ModInfoHolder.ModState.Disabled)
+                //{
+                //    Log("Can't update a disabled mod!");
+                //    return;
+                //}
                 if (ModDownloader.AddModDownload(modInfo, ModListStoreGithub))
                 {
                     ModListStoreLocal.SetValue(localMod.TreeIter, (int)TreeColumnInfo.Desc, "Updating...");
@@ -296,11 +298,11 @@ public partial class MainWindow : Gtk.Window
             }
             if (ModInfoTools.GithubMods.TryGetValue(modInfo.CloudName, out ModInfoHolder cloudModInfo))
             {
-                if (modInfo.State == ModInfoHolder.ModState.Disabled)
-                {
-                    Log("Can't update a disabled mod!");
-                    return;
-                }
+                //if (modInfo.State == ModInfoHolder.ModState.Disabled)
+                //{
+                //    Log("Can't update a disabled mod!");
+                //    return;
+                //}
                 if (ModDownloader.AddModDownload(cloudModInfo, ModListStoreGithub))
                 {
                     ModListStoreLocal.SetValue(modInfo.TreeIter, (int)TreeColumnInfo.Desc, "Updating...");
@@ -315,26 +317,29 @@ public partial class MainWindow : Gtk.Window
     {
         if (TabPagerMods.CurrentPage != 0) return;
         var modInfo = GetModInfoFromSelected();
-        var newState = (ModInfoHolder.ModState)comboboxModState.Active;
-        SetModState(modInfo, newState);
+        if (modInfo != null)
+        {
+            var newState = (ModInfoHolder.ModState)comboboxModState.Active;
+            SetModState(modInfo, newState);
+        }
     }
 
     private void SetModState(ModInfoHolder modInfo, ModInfoHolder.ModState newState)
     {
         if (newState == modInfo.State)
             return;
-        if (modInfo.State == ModInfoHolder.ModState.Disabled)
-        {
-            SetLocalModDisabled(ref modInfo.FilePath, false);
-        }
+        //if (modInfo.State == ModInfoHolder.ModState.Disabled)
+        //{
+        //    SetLocalModDisabled(ref modInfo.FilePath, false);
+        //}
         modInfo.State = newState;
         ModListStoreLocal.SetValue(modInfo.TreeIter, (int)TreeColumnInfo.State, newState == ModInfoHolder.ModState.Enabled);
-        if (newState == ModInfoHolder.ModState.Disabled)
-        {
-            SetLocalModDisabled(ref modInfo.FilePath, true);
-            Log("Relocated " + modInfo.FancyName());
-            return;
-        }
+        //if (newState == ModInfoHolder.ModState.Disabled)
+        //{
+        //    SetLocalModDisabled(ref modInfo.FilePath, true);
+        //    Log("Relocated " + modInfo.FancyName());
+        //    return;
+        //}
         modInfo.EditModJson("Enable", modInfo.State == ModInfoHolder.ModState.Enabled);
         if (newState == ModInfoHolder.ModState.Enabled)
         {
@@ -346,12 +351,12 @@ public partial class MainWindow : Gtk.Window
         }
     }
 
-    internal void SetLocalModDisabled(ref string path, bool Disable)
-    {
-        string newPath = ModInfoTools.RootFolder + @"/QMods" + (Disable ? @"-Disabled/" : @"/") + new System.IO.DirectoryInfo(path).Name;
-        System.IO.Directory.Move(path, newPath);
-        path = newPath;
-    }
+    //internal void SetLocalModDisabled(ref string path, bool Disable)
+    //{
+    //    string newPath = ModInfoTools.RootFolder + @"/QMods" + (Disable ? @"-Disabled/" : @"/") + new System.IO.DirectoryInfo(path).Name;
+    //    System.IO.Directory.Move(path, newPath);
+    //    path = newPath;
+    //}
 
     private bool EnableDependencies(ModInfoHolder mod)
     {
