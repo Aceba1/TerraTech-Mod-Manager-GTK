@@ -20,10 +20,11 @@ namespace TerraTechModManagerGTK
         /// </summary>
         public static Dictionary<string, ModInfoHolder> GithubMods = new Dictionary<string, ModInfoHolder>();
 
-        private static int GithubMod(ListStore TreeList, ModInfoHolder modinfo)
+        private static int GithubMod(ModInfoHolder modinfo)
         {
             int result = 0;
-            if (LocalMods.TryGetValue(modinfo.Name, out ModInfoHolder localModInfo))
+            bool foundOther = LocalMods.TryGetValue(modinfo.Name, out ModInfoHolder localModInfo);
+            if (foundOther)
             {
                 modinfo.FoundOther = 1;
                 localModInfo.FoundOther = 1;
@@ -31,21 +32,21 @@ namespace TerraTechModManagerGTK
                 {
                     Tools.invoke.Add(delegate
                     {
-                        TreeList.SetValue(modinfo.TreeIter, (int)TreeColumnInfo.Desc, "[Update Available] " + (string)TreeList.GetValue(modinfo.TreeIter, (int)TreeColumnInfo.Desc));
-                        TreeList.SetValue(modinfo.TreeIter, (int)TreeColumnInfo.Name, "<b>" + (string)TreeList.GetValue(modinfo.TreeIter, (int)TreeColumnInfo.Name) + "</b>");
+                        MainWindow.ModListStoreLocal.SetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Desc, "[Update Available] " + (string)MainWindow.ModListStoreLocal.GetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Desc));
+                        MainWindow.ModListStoreLocal.SetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Name, "<b>" + (string)MainWindow.ModListStoreLocal.GetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Name) + "</b>");
                     });
                     result = 1;
                 }
             }
             Tools.invoke.Add(delegate
             {
-                modinfo.TreeIter = TreeList.AppendValues(modinfo.FoundOther == 1, modinfo.FancyName(), modinfo.InlineDescription, modinfo.Author, modinfo);
+                modinfo.TreeIter = MainWindow.ModListStoreGithub.AppendValues(foundOther, modinfo.FancyName(), modinfo.InlineDescription, modinfo.Author, modinfo);
                 GithubMods.Add(modinfo.CloudName, modinfo);
             });
             return result;
         }
 
-        public static bool GetFirstGithubMods(ListStore TreeList, string Search = "")
+        public static bool GetFirstGithubMods(string Search = "")
         {
             int count = 0, updatecount = 0;
             LastSearch = Search;
@@ -54,7 +55,7 @@ namespace TerraTechModManagerGTK
             {
                 if (ModInfoHolder.TryGetModInfoFromRepo(mod, out var modinfo))
                 {
-                    updatecount += GithubMod(TreeList, modinfo);
+                    updatecount += GithubMod(modinfo);
                     //MainWindow.inst.Log("Added mod " + modinfo.CloudName);
                     count++;
                 }
@@ -67,7 +68,7 @@ namespace TerraTechModManagerGTK
             return Downloader.GetRepos.MorePagesAvailable;
         }
 
-        public static bool GetMoreGithubMods(ListStore TreeList)
+        public static bool GetMoreGithubMods()
         {
 
             int count = 0, updatecount = 0;
@@ -78,7 +79,7 @@ namespace TerraTechModManagerGTK
 
                 if (ModInfoHolder.TryGetModInfoFromRepo(mod, out var modinfo))
                 {
-                    updatecount += GithubMod(TreeList, modinfo);
+                    updatecount += GithubMod(modinfo);
                     //MainWindow.inst.Log("Added mod " + modinfo.CloudName);
                     count++;
                 }
@@ -110,25 +111,24 @@ namespace TerraTechModManagerGTK
                     }
                 }
 
-            qmods = Path.Combine(RootFolder, "/QMods-Disabled");
-            if (!Directory.Exists(qmods))
-            {
-                Directory.CreateDirectory(qmods);
-            }
-            else foreach (string folder in Directory.EnumerateDirectories(qmods))
-                {
-                    try
-                    {
-                        GetLocalMod_Internal(folder, true);
-                    }
-                    catch (Exception E)
-                    {
-                        Console.WriteLine("There was a problem handling a local mod: \n" + E.Message + "\nAt " + folder);
-                    }
-                }
+            //qmods = Path.Combine(RootFolder, "QMods-Disabled");
+            //if (Directory.Exists(qmods))
+            //{
+            //    foreach (string folder in Directory.EnumerateDirectories(qmods))
+            //    {
+            //        try
+            //        {
+            //            GetLocalMod_Internal(folder, true);
+            //        }
+            //        catch (Exception E)
+            //        {
+            //            Console.WriteLine("There was a problem handling a local mod: \n" + E.Message + "\nAt " + folder);
+            //        }
+            //    }
+            //}
         }
 
-        public static void GetLocalMod_Internal(string path, bool IsDisabled = false, bool ImmediatelyFromCloud = false)
+        public static void GetLocalMod_Internal(string path, /*bool IsDisabled = false,*/ bool ImmediatelyFromCloud = false)
         {
             string modjson = path + "/mod.json";
             string ttmmjson = path + "/ttmm.json";
@@ -146,7 +146,7 @@ namespace TerraTechModManagerGTK
                 }
                 if (modInfo != null)
                 {
-                    modInfo.State = IsDisabled ? ModInfoHolder.ModState.Disabled : (Convert.ToBoolean(json["Enable"]) ? ModInfoHolder.ModState.Enabled : ModInfoHolder.ModState.Inactive);
+                    modInfo.State = /*IsDisabled ? ModInfoHolder.ModState.Disabled :*/ (Convert.ToBoolean(json["Enable"]) ? ModInfoHolder.ModState.Enabled : ModInfoHolder.ModState.Inactive);
                     modInfo.FilePath = path;
                     modInfo.CloudName = modInfo.CloudName[0] == '/' ? modInfo.CloudName.Substring(1) : modInfo.CloudName;
                 }
@@ -156,7 +156,7 @@ namespace TerraTechModManagerGTK
                     {
                         Name = json["DisplayName"] as string,
                         Author = json["Author"] as string,
-                        State = IsDisabled ? ModInfoHolder.ModState.Disabled : (Convert.ToBoolean(json["Enable"]) ? ModInfoHolder.ModState.Enabled : ModInfoHolder.ModState.Inactive),
+                        State = /*IsDisabled ? ModInfoHolder.ModState.Disabled :*/ (Convert.ToBoolean(json["Enable"]) ? ModInfoHolder.ModState.Enabled : ModInfoHolder.ModState.Inactive),
                         FilePath = path,
                         InlineDescription = json["Id"] as string
                     };

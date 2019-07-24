@@ -77,7 +77,7 @@ public partial class MainWindow : Gtk.Window
         try
         {
             Log("Finding Github mods...");
-            buttonSearchMods.Visible = ModInfoTools.GetFirstGithubMods(ModListStoreGithub);
+            buttonSearchMods.Visible = ModInfoTools.GetFirstGithubMods();
         }
         catch (Exception E)
         {
@@ -89,7 +89,7 @@ public partial class MainWindow : Gtk.Window
         try
         {
             Log("Finding more Github mods...");
-            buttonSearchMods.Visible = ModInfoTools.GetMoreGithubMods(ModListStoreGithub);
+            buttonSearchMods.Visible = ModInfoTools.GetMoreGithubMods();
         }
         catch (Exception E)
         {
