@@ -34,9 +34,10 @@ namespace TerraTechModManagerGTK
                 Application.RunIteration();
                 if (Tools.invoke.Count != 0)
                 {
-                    foreach (System.Action method in Tools.invoke)
-                        method?.Invoke();
+                    var list = Tools.invoke.ToArray();
                     Tools.invoke.Clear();
+                    foreach (System.Action method in list)
+                        method?.Invoke();
                 }
             }
         }
