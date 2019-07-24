@@ -17,16 +17,16 @@ namespace TerraTechModManagerGTK
         public string[] RequiredModNames; //Json
         public string CurrentVersion; //Json
 
-        //[JsonIgnore]
+        [JsonIgnore]
         public int FoundOther;
 
-        //[JsonIgnore]
+        [JsonIgnore]
         public ModState State;
 
-        //[JsonIgnore]
+        [JsonIgnore]
         public string FilePath;
 
-        //[JsonIgnore]
+        [JsonIgnore]
         public Gtk.TreeIter TreeIter;
 
         public ModInfoHolder() { }
@@ -143,6 +143,7 @@ namespace TerraTechModManagerGTK
             return Description;
         }
 
+        [JsonIgnore]
         private string _fancyName;
         public string FancyName()
         {
