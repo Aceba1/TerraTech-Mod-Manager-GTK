@@ -176,7 +176,24 @@ public partial class MainWindow : Gtk.Window
 
     public void Log(string CurrentState)
     {
-        Tools.invoke.Add(delegate { labelCurrentTask.Text = CurrentState; });
+        if (string.IsNullOrEmpty(CurrentState))
+        {
+            Tools.invoke.Add(delegate
+            {
+                labelCurrentTask.Text = "";
+            });
+            return;
+        }
+        Tools.invoke.Add(delegate 
+        {
+            var i = CurrentState.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            string str = i[0];
+            if (i.Length > 1)
+            {
+                str += "\n" + i[1];
+            }
+            labelCurrentTask.Text = str;
+        });
         Console.WriteLine(CurrentState);
     }
 
