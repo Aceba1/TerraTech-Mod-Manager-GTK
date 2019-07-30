@@ -20,6 +20,7 @@ namespace TerraTechModManagerGTK
         /// </summary>
         public static Dictionary<string, ModInfoHolder> GithubMods = new Dictionary<string, ModInfoHolder>();
 
+        public static ModInfoHolder lastGithubMod;
         private static int GithubMod(ModInfoHolder modinfo)
         {
             int result = 0;
@@ -38,12 +39,25 @@ namespace TerraTechModManagerGTK
                     result = 1;
                 }
             }
+            lastGithubMod = modinfo;
             Tools.invoke.Add(delegate
             {
                 modinfo.TreeIter = MainWindow.ModListStoreGithub.AppendValues(foundOther, modinfo.FancyName(), modinfo.InlineDescription, modinfo.Author, modinfo);
                 GithubMods.Add(modinfo.CloudName, modinfo);
             });
             return result;
+        }
+
+        public static bool GetGithubMod(Downloader.GetRepos.GithubRepoItem mod)
+        {
+            if (ModInfoHolder.TryGetModInfoFromRepo(mod, out var modinfo))
+            {
+                GithubMod(modinfo);
+                //MainWindow.inst.Log("Added mod " + modinfo.CloudName);
+                return true;
+            }
+            Console.WriteLine(mod.html_url + " is invalid!");
+            return false;
         }
 
         public static bool GetFirstGithubMods(string Search = "")

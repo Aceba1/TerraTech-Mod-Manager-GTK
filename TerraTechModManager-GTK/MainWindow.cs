@@ -300,20 +300,31 @@ public partial class MainWindow : Gtk.Window
         }
         if (!string.IsNullOrEmpty(modInfo.CloudName))
         {
+            ModInfoHolder cloudModInfo = null;
             if (modInfo.FoundOther == 0)
             {
+                bool flag = true;
                 try
                 {
                     var repoItem = GetRepos.GetOneRepo(modInfo.CloudName);
+                    if (ModInfoTools.GetGithubMod(repoItem))
+                    {
+                        cloudModInfo = ModInfoTools.lastGithubMod;
+                        flag = false;
+                    }
                 }
-                catch
+                catch (Exception E)
+                {
+                    Console.WriteLine(E);
+                }
+                if (flag)
                 {
                     Log("Could not locate server mod!");
                     modInfo.FoundOther = -1;
                     return;
                 }
             }
-            if (ModInfoTools.GithubMods.TryGetValue(modInfo.CloudName, out ModInfoHolder cloudModInfo))
+            if (cloudModInfo != null || ModInfoTools.GithubMods.TryGetValue(modInfo.CloudName, out cloudModInfo))
             {
                 //if (modInfo.State == ModInfoHolder.ModState.Disabled)
                 //{
