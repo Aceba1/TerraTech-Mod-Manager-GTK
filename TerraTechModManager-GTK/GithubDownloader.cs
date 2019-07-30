@@ -304,6 +304,30 @@ namespace TerraTechModManagerGTK
                     }
                     if (serverMod.Description == null)
                         serverMod.GetDescription();
+                    if (ModInfoTools.LocalMods.TryGetValue(serverMod.Name, out ModInfoHolder existingMod) && existingMod.FilePath != Folder)
+                    {
+                        try
+                        {
+                            foreach (var file in new System.IO.DirectoryInfo(existingMod.FilePath).GetFiles("*", System.IO.SearchOption.AllDirectories))
+                            {
+                                string newPath = System.IO.Path.Combine(Folder, file.FullName.Substring(existingMod.FilePath.Length + 1));
+                                Console.WriteLine(newPath);
+                                if (!System.IO.File.Exists(newPath))
+                                {
+                                    System.IO.File.Move(file.FullName, newPath);
+                                }
+                                else
+                                {
+                                    System.IO.File.Delete(file.FullName);
+                                }
+                            }
+                            System.IO.Directory.Delete(existingMod.FilePath);
+                        }
+                        catch (Exception E)
+                        {
+                            MainWindow.inst.Log("Could not overlap existing mod folder with downloaded folder!\n" + E.Message);
+                        }
+                    }
                     System.IO.File.WriteAllText(System.IO.Path.Combine(Folder, "ttmm.json"), JsonConvert.SerializeObject(serverMod, Formatting.Indented));
                     ModInfoTools.GetLocalMod_Internal(Folder,/* false,*/ true);
                     Tools.invoke.Add(delegate
