@@ -59,6 +59,11 @@ namespace TerraTechModManagerGTK
 
         private static void HandlePatcher(object sender, DataReceivedEventArgs e)
         {
+            if (e == null)
+            {
+                MainWindow.inst.Log("Communication with patcher is lost!");
+                return;
+            }
             if (string.IsNullOrEmpty(e.Data)) return;
             if (e.Data.EndsWith("exit..."))
             {
