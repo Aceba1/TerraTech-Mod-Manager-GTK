@@ -442,7 +442,49 @@ public partial class MainWindow : Gtk.Window
 
     protected void TryDownloadAllModUpdates(object sender, EventArgs e)
     {
-        Log("That button doesn't do anything yet, sorry");
+        foreach (var localMod in ModInfoTools.LocalMods)
+        {
+            if (localMod.Value.CloudName != null)
+            {
+                ModInfoHolder cloudModInfo = null;
+                if (localMod.Value.FoundOther == 0)
+                {
+                    bool flag = true;
+                    try
+                    {
+                        var repoItem = GetRepos.GetOneRepo(localMod.Value.CloudName);
+                        if (ModInfoTools.GetGithubMod(repoItem))
+                        {
+                            cloudModInfo = ModInfoTools.lastGithubMod;
+                            flag = false;
+                        }
+                    }
+                    catch (Exception E)
+                    {
+                        Console.WriteLine(E);
+                    }
+                    if (flag)
+                    {
+                        localMod.Value.FoundOther = -1;
+                    }
+                }
+                if (cloudModInfo != null || ModInfoTools.GithubMods.TryGetValue(localMod.Value.CloudName, out cloudModInfo))
+                {
+                    if (localMod.Value.CurrentVersion == cloudModInfo.CurrentVersion) continue;
+
+                    //if (localMod.Value.State == ModInfo.ModState.Disabled)
+                    //{
+                    //    Log("Can't update a disabled mod! (" + localMod.Value.Name + ")", Color.OrangeRed);
+                    //    continue;
+                    //}
+                    if (ModDownloader.AddModDownload(cloudModInfo, ModListStoreGithub))
+                    {
+                        ModListStoreLocal.SetValue(localMod.Value.TreeIter, (int)TreeColumnInfo.Desc, "Updating...");
+                    }
+                    continue;
+                }
+            }
+        }
     }
 
     protected void OpenGithubPage(object sender, EventArgs e)
