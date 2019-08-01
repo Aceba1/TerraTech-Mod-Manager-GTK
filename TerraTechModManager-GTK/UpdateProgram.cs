@@ -42,8 +42,8 @@ namespace TerraTechModManagerGTK
             string targetPath = AppDomain.CurrentDomain.BaseDirectory;
             string downloadPath = Path.Combine(targetPath, "Update");
             var info = Directory.CreateDirectory(downloadPath);
-            string executable = Path.Combine(targetPath, info.GetFiles("*.exe")[0].Name);
             Downloader.DownloadFolder.Download("https://github.com/Aceba1/TerraTech-Mod-Manager-GTK/tree/master/Build/TTMM", "Aceba1/TerraTech-Mod-Manager-GTK", downloadPath);
+            string executable = Path.Combine(targetPath, info.GetFiles("*.exe")[0].Name);
 
             Process process = new Process();
             ProcessStartInfo startInfo = new ProcessStartInfo();
@@ -52,12 +52,12 @@ namespace TerraTechModManagerGTK
                 startInfo.FileName = "/bin/bash";
                 startInfo.Arguments = $" -c \"" +
                     $"echo Begin install...&&" +
-                    $"sleep 8s&&" +
+                    $"sleep 5s&&" +
                     $"cd '{downloadPath}'&&" +
                     $"mv -f * ..&&" +
                     $"rm -r {downloadPath}" +
                     $"echo Done!&&" +
-                    $"sleep 2s&&" +
+                    $"sleep 5s&&" +
                     $"mono '{executable}'\"";
                 startInfo.CreateNoWindow = false;
             }
@@ -66,11 +66,11 @@ namespace TerraTechModManagerGTK
                 startInfo.FileName = "cmd.exe";
                 startInfo.Arguments = "/C" +
                     $"echo Begin install...&" +
-                    $"timeout 8>NUL&" +
+                    $"timeout 5&" +
                     $"move /y \"{downloadPath}\\*\" \"{targetPath}\"&" +
                     $"del /q {downloadPath}&" +
                     $"echo Done!&" +
-                    $"timeout 2>NUL&" +
+                    $"timeout 5&" +
                     $"start \"ttmm2\" \"{executable}\"";
             }
             process.StartInfo = startInfo;
