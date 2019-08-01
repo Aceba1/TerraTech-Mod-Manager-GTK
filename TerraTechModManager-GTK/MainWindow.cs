@@ -526,15 +526,18 @@ public partial class MainWindow : Gtk.Window
 
     protected void UserUpdatePatch(object sender, EventArgs e)
     {
+        KillPatcher();
         Patcher.RunByUser = false;
+        ConfigHandler.SetValue("lastpatchversion", Tools.Version_Number);
+        Tasks.AddToTaskQueue(new Task(UpdatePatch));
+    }
+
+    private void UpdatePatch()
+    {
         Patcher.UpdatePatcher(System.IO.Path.Combine(ModInfoTools.DataFolder, "Managed"));
         Patcher.RunExe("-u");
         Patcher.IsReinstalling = true;
-
-        ConfigHandler.SetValue("lastpatchversion", Tools.Version_Number);
     }
-
-
 
     protected void UserUpdateTTMM(object sender, EventArgs e)
     {
