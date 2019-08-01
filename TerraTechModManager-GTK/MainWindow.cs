@@ -70,21 +70,31 @@ public partial class MainWindow : Gtk.Window
         }
         catch (Exception E)
         {
+            _SupressGithubMessage = true;
             Log("Unable to use patcher! Game may not load mods!\n" + E.Message);
         }
     }
+
+    bool _SupressGithubMessage;
 
     private void GetGithubMods()
     {
         try
         {
-            Log("Finding Github mods...");
+            if (!_SupressGithubMessage)
+            {
+                Log("Finding Github mods...");
+            }
             buttonSearchMods.Visible = ModInfoTools.GetFirstGithubMods();
         }
         catch (Exception E)
         {
-            Log("Unable to get Github mods!\n" + E.Message);
+            if (!_SupressGithubMessage)
+            {
+                Log("Unable to get Github mods!\n" + E.Message);
+            }
         }
+        _SupressGithubMessage = false;
     }
     private void GetMoreGithubMods()
     {
