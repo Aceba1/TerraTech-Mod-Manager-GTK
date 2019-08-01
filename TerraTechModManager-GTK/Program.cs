@@ -56,7 +56,7 @@ namespace TerraTechModManagerGTK
     public static class Tools
     {
 #warning CHANGE 'Version_Number' WITH EVERY RELEASE
-        public const string Version_Number = "0.1.0";
+        public const string Version_Number = "0.2.0";
 
         public const string GithubPage = "Aceba1/TerraTech-Mod-Manager-GTK";
 
