@@ -336,3 +336,4 @@ Build/TTMM/*.xml
 Build/TTMM/config.json
 Build/TTMM/*.config
 *.json
+TTMM.zip
