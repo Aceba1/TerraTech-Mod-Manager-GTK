@@ -71,7 +71,7 @@ namespace TerraTechModManagerGTK
                 EXE.OutputDataReceived -= HandlePatcher;
                 try
                 {
-                    EXE.CloseMainWindow();
+                    EXE.Kill();
                 }
                 catch { /* fail silently */ }
                 try

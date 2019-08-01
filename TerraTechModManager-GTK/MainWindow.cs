@@ -21,7 +21,7 @@ public partial class MainWindow : Gtk.Window
     public MainWindow() : base(Gtk.WindowType.Toplevel)
     {
         //Kill running QModManager processes, if there are any
-        foreach (var k in System.Diagnostics.Process.GetProcessesByName("QModManager")) k.Kill();
+        KillPatcher();
 
         Build();
         SetupTree();
@@ -165,6 +165,11 @@ public partial class MainWindow : Gtk.Window
         Tools.AllowedToRun = false;
 
         //Kill running QModManager processes, if there are any
+        KillPatcher();
+    }
+
+    public void KillPatcher()
+    {
         foreach (var k in System.Diagnostics.Process.GetProcessesByName("QModManager")) k.Kill();
     }
 
