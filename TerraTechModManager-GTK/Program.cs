@@ -21,7 +21,17 @@ namespace TerraTechModManagerGTK
             Application.Init();
 
             ConfigHandler.LoadConfig();
-            
+
+            string updateFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Update"); ;
+            if (Directory.Exists(updateFolder))
+            {
+                try
+                {
+                    Directory.Delete(updateFolder);
+                }
+                catch { /* fail silently */}
+            }
+
             if (ConfigHandler.CacheValue("skipstart", false))
                 Start.text_st = Start.BootMain(Tools.TTRoot.Value);
             if (!Start.finished)
