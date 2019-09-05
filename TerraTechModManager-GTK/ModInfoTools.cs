@@ -21,7 +21,7 @@ namespace TerraTechModManagerGTK
         public static Dictionary<string, ModInfoHolder> GithubMods = new Dictionary<string, ModInfoHolder>();
 
         public static ModInfoHolder lastGithubMod;
-        private static int GithubMod(ModInfoHolder modinfo)
+        private static int GithubMod(ModInfoHolder modinfo/*, bool IsMainThread*/)
         {
             int result = 0;
             bool foundOther = LocalMods.TryGetValue(modinfo.Name, out ModInfoHolder localModInfo);
@@ -31,20 +31,30 @@ namespace TerraTechModManagerGTK
                 localModInfo.FoundOther = 1;
                 if (!string.IsNullOrWhiteSpace(modinfo.CurrentVersion) && localModInfo.CurrentVersion != modinfo.CurrentVersion)
                 {
-                    Tools.invoke.Add(delegate
-                    {
+                    //if (IsMainThread)
+                    //{
                         MainWindow.ModListStoreLocal.SetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Desc, "[Update Available] " + (string)MainWindow.ModListStoreLocal.GetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Desc));
                         MainWindow.ModListStoreLocal.SetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Name, "<b>" + (string)MainWindow.ModListStoreLocal.GetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Name) + "</b>");
-                    });
+                    //}
+                    //else Tools.invoke.Add(delegate
+                    //{
+                    //    MainWindow.ModListStoreLocal.SetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Desc, "[Update Available] " + (string)MainWindow.ModListStoreLocal.GetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Desc));
+                    //    MainWindow.ModListStoreLocal.SetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Name, "<b>" + (string)MainWindow.ModListStoreLocal.GetValue(localModInfo.TreeIter, (int)TreeColumnInfo.Name) + "</b>");
+                    //});
                     result = 1;
                 }
             }
             lastGithubMod = modinfo;
-            Tools.invoke.Add(delegate
-            {
+            //if (IsMainThread)
+            //{
                 modinfo.TreeIter = MainWindow.ModListStoreGithub.AppendValues(foundOther, modinfo.FancyName(), modinfo.InlineDescription, modinfo.Author, modinfo);
                 GithubMods.Add(modinfo.CloudName, modinfo);
-            });
+            //}
+            //else Tools.invoke.Add(delegate
+            //{
+            //    modinfo.TreeIter = MainWindow.ModListStoreGithub.AppendValues(foundOther, modinfo.FancyName(), modinfo.InlineDescription, modinfo.Author, modinfo);
+            //    GithubMods.Add(modinfo.CloudName, modinfo);
+            //});
             return result;
         }
 
@@ -117,7 +127,7 @@ namespace TerraTechModManagerGTK
                 {
                     try
                     {
-                        GetLocalMod_Internal(folder, false);
+                        GetLocalMod_Internal(folder/*, false*/);
                     }
                     catch (Exception E)
                     {
@@ -142,7 +152,7 @@ namespace TerraTechModManagerGTK
             //}
         }
 
-        public static void GetLocalMod_Internal(string path, /*bool IsDisabled = false,*/ bool ImmediatelyFromCloud = false)
+        public static void GetLocalMod_Internal(string path /*, bool IsDisabled = false*/ /*, bool IsMainThread*/)
         {
             string modjson = path + "/mod.json";
             string ttmmjson = path + "/ttmm.json";
@@ -178,12 +188,19 @@ namespace TerraTechModManagerGTK
 
                 if (LocalMods.TryGetValue(modInfo.Name, out ModInfoHolder oldModInfo))
                 {
+                    //if (IsMainThread)               MainWindow.ModListStoreLocal.Remove(ref oldModInfo.TreeIter);
+                    //else
                     Tools.invoke.Add(delegate{ MainWindow.ModListStoreLocal.Remove(ref oldModInfo.TreeIter); });
                 }
+                //if (IsMainThread)
+                //{
+                //    modInfo.TreeIter = MainWindow.ModListStoreLocal.InsertWithValues(0, modInfo.State == ModInfoHolder.ModState.Enabled, modInfo.FancyName(), modInfo.InlineDescription, modInfo.Author, modInfo);
+                //    LocalMods[modInfo.Name] = modInfo;
+                //}
+                //else 
                 Tools.invoke.Add(delegate
                 {
                     modInfo.TreeIter = MainWindow.ModListStoreLocal.InsertWithValues(0, modInfo.State == ModInfoHolder.ModState.Enabled, modInfo.FancyName(), modInfo.InlineDescription, modInfo.Author, modInfo);
-
                     LocalMods[modInfo.Name] = modInfo;
                 });
                 //if (modInfo.CloudName != null && modInfo.CloudName != "" && flag)
