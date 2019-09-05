@@ -18,6 +18,21 @@ namespace TerraTechModManagerGTK
     {
         public static void Main(string[] args)
         {
+            //FileStream LogFile = null;
+            //try
+            //{
+            //    if (File.Exists("ttmm_log.txt"))
+            //        File.Delete("ttmm_log.txt");
+            //    LogFile = new FileStream("ttmm_log.txt", FileMode.OpenOrCreate, FileAccess.Write);
+            //    Console.SetOut(new StreamWriter(LogFile));
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine("Unable to write to ttmm_log.txt");
+            //    Console.WriteLine(e.ToString());
+            //}
+            //try
+            //{
             Application.Init();
 
             ConfigHandler.LoadConfig();
@@ -50,6 +65,21 @@ namespace TerraTechModManagerGTK
                         method?.Invoke();
                 }
             }
+            //}
+            //catch (Exception E)
+            //{
+            //    Console.WriteLine(E.ToString());
+            //    while (E.InnerException != null)
+            //    {
+            //        E = E.InnerException;
+            //        Console.WriteLine(E.ToString());
+            //    }
+            //}
+            //finally
+            //{
+            //    if (LogFile != null)
+            //        LogFile.Close();
+            //}
         }
     }
 
