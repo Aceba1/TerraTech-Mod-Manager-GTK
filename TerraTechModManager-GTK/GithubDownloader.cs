@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace TerraTechModManagerGTK
 {
@@ -101,7 +102,7 @@ namespace TerraTechModManagerGTK
                 {
                     if (entry.type == "file" && entry.name == "mod.json")
                     {
-                        DownloadPath = System.IO.Path.Combine(DownloadPath, CloudName.Substring(CloudName.LastIndexOf('/') + 1));
+                        DownloadPath = Path.Combine(DownloadPath, CloudName.Substring(CloudName.LastIndexOf('/') + 1));
                         break;
                     }
                 }
@@ -126,9 +127,9 @@ namespace TerraTechModManagerGTK
 
                         if (localItem.type == "dir")
                         {
-                            if (!System.IO.Directory.Exists(DownloadFolder + CurrentPath + "/" + localItem.name))
+                            if (!Directory.Exists(DownloadFolder + CurrentPath + "/" + localItem.name))
                             {
-                                System.IO.Directory.CreateDirectory(DownloadFolder + CurrentPath + "/" + localItem.name);
+                                Directory.CreateDirectory(DownloadFolder + CurrentPath + "/" + localItem.name);
                             }
 
                             var subEntries = WebClientHandler.DeserializeApiCall<GithubItem[]>(localItem.url);
@@ -149,13 +150,13 @@ namespace TerraTechModManagerGTK
                             {
                                 MainWindow.inst.Log("Downloading " + CurrentPath + "/" + localItem.name);
                                 string filepath = DownloadFolder + CurrentPath + "/" + localItem.name;
-                                if (System.IO.File.Exists(filepath))
+                                if (File.Exists(filepath))
                                 {
                                     while (true)
                                     {
                                         try
                                         {
-                                            System.IO.File.Delete(filepath);
+                                            File.Delete(filepath);
                                             break;
                                         }
                                         catch (Exception E)
@@ -288,12 +289,12 @@ namespace TerraTechModManagerGTK
                 string Folder = null;
                 try
                 {
-                    Folder = Downloader.DownloadFolder.Download(param[0], param[1], System.IO.Path.Combine(Tools.TTRoot.Value, "QMods")).First();
+                    Folder = Downloader.DownloadFolder.Download(param[0], param[1], Path.Combine(Tools.TTRoot.Value, "QMods")).First();
                     if (DownloadFolder.KillDownload != 0)
                     {
                         MainWindow.inst.Log("Download was killed!");
                         if (DownloadFolder.KillDownload == 2)
-                        System.IO.Directory.Delete(Folder, true);
+                        Directory.Delete(Folder, true);
                         DownloadFolder.KillDownload = 0;
                         Download_Internal_2();
                         return;
@@ -304,32 +305,33 @@ namespace TerraTechModManagerGTK
                     }
                     if (serverMod.Description == null)
                         serverMod.GetDescription();
-                    if (ModInfoTools.LocalMods.TryGetValue(serverMod.Name, out ModInfoHolder existingMod) && existingMod.FilePath != Folder)
+                    if (ModInfoTools.LocalMods.TryGetValue(serverMod.Name, out ModInfoHolder existingMod) && new DirectoryInfo(existingMod.FilePath).FullName != new DirectoryInfo(Folder).FullName)
                     {
+                        MainWindow.inst.Log("Overlapping existing mod folder with downloaded folder...");
                         try
                         {
-                            foreach (var file in new System.IO.DirectoryInfo(existingMod.FilePath).GetFiles("*", System.IO.SearchOption.AllDirectories))
+                            foreach (var file in new DirectoryInfo(existingMod.FilePath).GetFiles("*", SearchOption.AllDirectories))
                             {
-                                string newPath = System.IO.Path.Combine(Folder, file.FullName.Substring(existingMod.FilePath.Length + 1));
+                                string newPath = Path.Combine(Folder, file.FullName.Substring(existingMod.FilePath.Length + 1));
                                 Console.WriteLine(newPath);
-                                if (!System.IO.File.Exists(newPath))
+                                if (!File.Exists(newPath))
                                 {
-                                    System.IO.File.Move(file.FullName, newPath);
+                                    File.Move(file.FullName, newPath);
                                 }
                                 else
                                 {
-                                    System.IO.File.Delete(file.FullName);
+                                    File.Delete(file.FullName);
                                 }
                             }
-                            System.IO.Directory.Delete(existingMod.FilePath);
+                            Directory.Delete(existingMod.FilePath);
                         }
                         catch (Exception E)
                         {
                             MainWindow.inst.Log("Could not overlap existing mod folder with downloaded folder!\n" + E.Message);
                         }
                     }
-                    System.IO.File.WriteAllText(System.IO.Path.Combine(Folder, "ttmm.json"), JsonConvert.SerializeObject(serverMod, Formatting.Indented));
-                    ModInfoTools.GetLocalMod_Internal(Folder,/* false,*/ true);
+                    File.WriteAllText(Path.Combine(Folder, "ttmm.json"), JsonConvert.SerializeObject(serverMod, Formatting.Indented));
+                    ModInfoTools.GetLocalMod_Internal(Folder/*, false*//*, false*/);
                     Tools.invoke.Add(delegate
                     {
                         MainWindow.ModListStoreGithub.SetValue(serverMod.TreeIter, (int)TreeColumnInfo.State, true);
@@ -341,7 +343,7 @@ namespace TerraTechModManagerGTK
                     MainWindow.inst.Log(e.Message);
                     if (!string.IsNullOrEmpty(Folder))
                     {
-                        System.IO.Directory.Delete(Folder, true);
+                        Directory.Delete(Folder, true);
                     }
                     MainWindow.inst.Log("Failed!\n" + e.Message);
                     Console.WriteLine(e.StackTrace);
