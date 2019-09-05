@@ -61,7 +61,14 @@ namespace TerraTechModManagerGTK
 
         protected void OpenSiteEvent(object sender, EventArgs e)
         {
-            Process.Start(Site);
+            if (!string.IsNullOrWhiteSpace(Site))
+            {
+                Process.Start(Site);
+            }
+            else
+            {
+                OpenFolderEvent(sender, e);
+            }
         }
 
         protected void InstallModEvent(object sender, EventArgs e)
