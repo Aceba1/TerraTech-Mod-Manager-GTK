@@ -8,10 +8,9 @@ using TerraTechModManagerGTK.Downloader;
 
 public partial class MainWindow : Gtk.Window
 {
-    public static ListStore ModListStoreLocal;
-    public static ListStore ModListStoreGithub;
-    //private TreeIter TGithubIter;
-    //private TreeIter TLocalIter;
+    public static ListStore ModListStoreLocal, ModListStoreGithub;
+    public static TreeModelFilter ModFilterLocal, ModFilterGithub;
+    public static TreeModelSort ModSortLocal, ModSortGithub;
 
     public static MainWindow inst;
 
@@ -137,9 +136,12 @@ public partial class MainWindow : Gtk.Window
         AddColumn("Description", treeviewLocalMods, new CellRendererText(), "text", 2);
         AddColumn("Author", treeviewLocalMods, new CellRendererText(), "text", 3);
         ModListStoreLocal = new ListStore(typeof(bool), typeof(string), typeof(string), typeof(string), typeof(ModInfoHolder));
+        ModFilterLocal = new TreeModelFilter(ModListStoreLocal, null);
+        ModSortLocal = new TreeModelSort(ModFilterLocal);
+        treeviewLocalMods.Model = ModSortLocal;
 
-        treeviewLocalMods.Model = ModListStoreLocal;
-
+        ModFilterLocal.VisibleFunc = new TreeModelFilterVisibleFunc(FilterTree);
+        ModSortLocal.DefaultSortFunc = new TreeIterCompareFunc(SortTree);
 
         treeviewGithubMods.Selection.Changed += TreeView_SelectionChanged;
 
@@ -149,8 +151,27 @@ public partial class MainWindow : Gtk.Window
         AddColumn("Description", treeviewGithubMods, new CellRendererText(), "text", 2);
         AddColumn("Author", treeviewGithubMods, new CellRendererText(), "text", 3);
         ModListStoreGithub = new ListStore(typeof(bool), typeof(string), typeof(string), typeof(string), typeof(ModInfoHolder));
+        ModFilterGithub = new TreeModelFilter(ModListStoreGithub, null);
+        ModSortGithub = new TreeModelSort(ModFilterGithub);
+        treeviewGithubMods.Model = ModSortGithub;
 
-        treeviewGithubMods.Model = ModListStoreGithub;
+        ModFilterGithub.VisibleFunc = new TreeModelFilterVisibleFunc(FilterTree);
+        ModSortGithub.DefaultSortFunc = new TreeIterCompareFunc(SortTree);
+    }
+
+    private bool FilterTree(TreeModel treeModel, TreeIter iter)
+    {
+        string search = entryModSearch.Text.ToLower();
+        if (string.IsNullOrWhiteSpace(search))
+            return true;
+        return ((string)treeModel.GetValue(iter, (int)TreeColumnInfo.Name)).ToLower().Contains(search) ||
+            ((string)treeModel.GetValue(iter, (int)TreeColumnInfo.Author)).ToLower().Contains(search) ||
+            ((string)treeModel.GetValue(iter, (int)TreeColumnInfo.Desc)).ToLower().Contains(search);
+    }
+
+    private int SortTree(TreeModel treeModel, TreeIter A, TreeIter B)
+    {
+        return 0;
     }
 
     TreeView CurrentTreeView
@@ -233,10 +254,16 @@ public partial class MainWindow : Gtk.Window
     private void TreeView_SelectionChanged(object sender, EventArgs e)
     {
         bool flag = CurrentTreeView.Selection.CountSelectedRows() != 0;
-        ModInfoVBox.Visible = flag;
         if (flag)
         {
-            UpdateModInfoUI(GetModInfoFromSelected());
+            var mod = GetModInfoFromSelected();
+            ModInfoVBox.Visible = mod != null;
+            if (mod != null)
+                UpdateModInfoUI(mod);
+        }
+        else
+        {
+            ModInfoVBox.Visible = false;
         }
     }
 
@@ -270,15 +297,17 @@ public partial class MainWindow : Gtk.Window
     {
         switch (TabPagerMods.CurrentPage)
         {
-            case 0: return (ModInfoHolder)ModListStoreLocal.GetValue(Row, (int)TreeColumnInfo.ModInfo);
-            case 1: return (ModInfoHolder)ModListStoreGithub.GetValue(Row, (int)TreeColumnInfo.ModInfo);
+            case 0: return (ModInfoHolder)ModSortLocal.GetValue(Row, (int)TreeColumnInfo.ModInfo);
+            case 1: return (ModInfoHolder)ModSortGithub.GetValue(Row, (int)TreeColumnInfo.ModInfo);
             default: return null;
         }
     }
 
     protected void EntryModSearchActivated(object sender, EventArgs e)
     {
-        Log("That button doesn't do anything yet, sorry");
+        ModFilterGithub.Refilter();
+        ModFilterLocal.Refilter();
+        Log("Refiltered");
     }
 
     protected void ButtonSearchModsClicked(object sender, EventArgs e)
