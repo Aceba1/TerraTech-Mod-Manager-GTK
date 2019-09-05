@@ -323,34 +323,39 @@ public partial class MainWindow : Gtk.Window
     protected void GetModFromCloud(object sender, EventArgs e)
     {
         var modInfo = GetModInfoFromSelected();
-        if (TabPagerMods.CurrentPage != 0)
+        DownloadMod(modInfo, TabPagerMods.CurrentPage);
+    }
+
+    public void DownloadMod(ModInfoHolder ModRef, int TabPage)
+    {
+        if (TabPage != 0) // Is a server tab
         {
-            if (modInfo.FoundOther == 1)
+            if (ModRef.FoundOther == 1)
             {
-                var localMod = ModInfoTools.LocalMods[modInfo.Name];
+                var localMod = ModInfoTools.LocalMods[ModRef.Name];
                 //if (localMod.State == ModInfoHolder.ModState.Disabled)
                 //{
                 //    Log("Can't update a disabled mod!");
                 //    return;
                 //}
-                if (ModDownloader.AddModDownload(modInfo, ModListStoreGithub))
+                if (ModDownloader.AddModDownload(ModRef, ModListStoreGithub))
                 {
                     ModListStoreLocal.SetValue(localMod.TreeIter, (int)TreeColumnInfo.Desc, "Updating...");
                 }
                 return;
             }
-            ModDownloader.AddModDownload(modInfo, ModListStoreGithub);
+            ModDownloader.AddModDownload(ModRef, ModListStoreGithub);
             return;
         }
-        if (!string.IsNullOrEmpty(modInfo.CloudName))
+        if (!string.IsNullOrEmpty(ModRef.CloudName))
         {
             ModInfoHolder cloudModInfo = null;
-            if (modInfo.FoundOther == 0)
+            if (ModRef.FoundOther == 0)
             {
                 bool flag = true;
                 try
                 {
-                    var repoItem = GetRepos.GetOneRepo(modInfo.CloudName);
+                    var repoItem = GetRepos.GetOneRepo(ModRef.CloudName);
                     if (ModInfoTools.GetGithubMod(repoItem))
                     {
                         cloudModInfo = ModInfoTools.lastGithubMod;
@@ -364,11 +369,11 @@ public partial class MainWindow : Gtk.Window
                 if (flag)
                 {
                     Log("Could not locate server mod!");
-                    modInfo.FoundOther = -1;
+                    ModRef.FoundOther = -1;
                     return;
                 }
             }
-            if (cloudModInfo != null || ModInfoTools.GithubMods.TryGetValue(modInfo.CloudName, out cloudModInfo))
+            if (cloudModInfo != null || ModInfoTools.GithubMods.TryGetValue(ModRef.CloudName, out cloudModInfo))
             {
                 //if (modInfo.State == ModInfoHolder.ModState.Disabled)
                 //{
@@ -377,7 +382,7 @@ public partial class MainWindow : Gtk.Window
                 //}
                 if (ModDownloader.AddModDownload(cloudModInfo, ModListStoreGithub))
                 {
-                    ModListStoreLocal.SetValue(modInfo.TreeIter, (int)TreeColumnInfo.Desc, "Updating...");
+                    ModListStoreLocal.SetValue(ModRef.TreeIter, (int)TreeColumnInfo.Desc, "Updating...");
                     return;
                 }
             }
@@ -593,7 +598,7 @@ public partial class MainWindow : Gtk.Window
         var modInfo = GetModInfoFromSelected();
         _dialogDescription.Site = modInfo.Site;
         _dialogDescription.Folder = modInfo.FilePath;
-        _dialogDescription.Set(TabPagerMods.CurrentPage != 0? DialogDescription.DescType.ServerModInfo : DialogDescription.DescType.LocalModInfo, modInfo.FancyName(), modInfo.GetDescription());
+        _dialogDescription.Set(modInfo, TabPagerMods.CurrentPage != 0? DialogDescription.DescType.ServerModInfo : DialogDescription.DescType.LocalModInfo, modInfo.CurrentVersion, modInfo.GetDescription(), modInfo.FancyName());
     }
 
     private void Description_Clear(object sender, EventArgs e)

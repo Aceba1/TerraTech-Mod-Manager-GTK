@@ -8,6 +8,8 @@ namespace TerraTechModManagerGTK
 
         public string Site, Folder, CloudName;
 
+        private ModInfoHolder Mod;
+
         public enum DescType { NoButtons, LocalModInfo, ServerModInfo, UpdateInfo }
 
         public DialogDescription()
@@ -16,8 +18,9 @@ namespace TerraTechModManagerGTK
             entry3.Visible = false;
         }
 
-        public void Set(DescType WindowType, string Title, string Message, string WindowTitle = null)
+        public void Set(ModInfoHolder Mod, DescType WindowType, string Title, string Message, string WindowTitle = null)
         {
+            this.Mod = Mod;
             LocalModInfoArea.Visible = false;
             ServerModInfoArea.Visible = false;
             UpdateInfoArea.Visible = false;
@@ -63,6 +66,7 @@ namespace TerraTechModManagerGTK
 
         protected void InstallModEvent(object sender, EventArgs e)
         {
+            MainWindow.inst.DownloadMod(Mod, 1);
         }
 
         protected void InstallUpdateEvent(object sender, EventArgs e)

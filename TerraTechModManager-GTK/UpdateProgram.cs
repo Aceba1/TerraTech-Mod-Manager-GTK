@@ -22,7 +22,7 @@ namespace TerraTechModManagerGTK
                     {
                         using (var updateScreen = new DialogDescription())
                         {
-                            updateScreen.Set(DialogDescription.DescType.UpdateInfo, $"<b>Update: {latest.name}</b>", latest.body, latest.tag_name);
+                            updateScreen.Set(null, DialogDescription.DescType.UpdateInfo, $"<b>Update: {latest.name}</b>", latest.body, latest.tag_name);
                             updateScreen.Site = latest.html_url;
                             updateScreen.Show();
                         }
