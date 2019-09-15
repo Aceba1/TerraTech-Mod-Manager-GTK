@@ -103,6 +103,7 @@ namespace TerraTechModManagerGTK
                 return (p == PlatformID.Unix) || (p == PlatformID.MacOSX) || (p == (PlatformID)128);
             }
         }
+        public static bool IsMacOSX { get; set; }
 
         public static bool AllowedToRun { get; set; } = true;
 
@@ -110,13 +111,19 @@ namespace TerraTechModManagerGTK
         {
             string path;
             if (IsLinux)
-            { 
+            {
                 string home = Environment.GetEnvironmentVariable("HOME");
-                path = home + "/.steam/steam/steamapps/common/TerraTech";
+                path = home + "/.steam/steam/steamapps/common";
                 if (!Directory.Exists(path))
                 {
-                    path = home + "/.local/share/Steam/steamapps/common/TerraTech";
+                    path = home + "/.local/share/Steam/steamapps/common";
                 }
+                if (!Directory.Exists(path)) // IsMacOSX - Should not hard guess at this stage, but if it is linux and neither path above is valid...
+                {
+                    path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Library/Application Support/Steam/steamapps/common");
+                }
+
+                path += "/TerraTech";
                 if (!Directory.Exists(path))
                 {
                     if (Directory.Exists(path + " Beta"))
@@ -127,7 +134,7 @@ namespace TerraTechModManagerGTK
             }
             else
             {
-                path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\TerraTech";
+                path = @"C:\Program Files (x86)\Steam\steamapps\common\TerraTech";
                 if (!Directory.Exists(path))
                 {
                     if (Directory.Exists(path + " Beta"))

@@ -25,22 +25,31 @@ namespace TerraTechModManagerGTK
                 base.Visible = false;//.Hide();
         }
 
-        public static string BootMain(string path)
+        public static string BootMain(string rootpath)
         {
-            string rootpath = path;
             if (Directory.Exists(rootpath))
             {
-                int file = Directory.GetFiles(rootpath, "TerraTech*.*", System.IO.SearchOption.TopDirectoryOnly).Length;
                 string datafolder = "";
-                if (file != 0)
+                bool file;
+                if (Tools.IsLinux) 
                 {
-                    bool flag = false;
-                    foreach (var folder in new System.IO.DirectoryInfo(rootpath).GetDirectories())
-                        if (File.Exists(folder.FullName + "/Managed/Assembly-CSharp.dll"))
+                    datafolder = System.IO.Path.Combine(rootpath, "TerraTechOSX64.app/Contents/Resources/Data");
+                    file = File.Exists(System.IO.Path.Combine(datafolder, "Managed/Assembly-CSharp.dll"));
+                    Tools.IsMacOSX = file; // Define whether or not this OS is a mac
+                }
+                file = Tools.IsMacOSX || Directory.GetFiles(rootpath, "TerraTech*.*", System.IO.SearchOption.TopDirectoryOnly).Length != 0; //If not a mac, look for executable
+                if (file)
+                {
+                    bool flag = Tools.IsMacOSX;
+                    if (!flag) // If not a mac, search for Assembly
+                        foreach (var folder in new System.IO.DirectoryInfo(rootpath).GetDirectories())
                         {
-                            datafolder = folder.FullName;
-                            flag = true;
-                            break;
+                            if (File.Exists(folder.FullName + "/Managed/Assembly-CSharp.dll"))
+                            {
+                                datafolder = folder.FullName;
+                                flag = true;
+                                break;
+                            }
                         }
                     if (flag)
                     {
