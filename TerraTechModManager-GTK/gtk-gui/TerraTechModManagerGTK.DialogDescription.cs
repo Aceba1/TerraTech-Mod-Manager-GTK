@@ -45,6 +45,7 @@ namespace TerraTechModManagerGTK
 			global::Stetic.Gui.Initialize(this);
 			// Widget TerraTechModManagerGTK.DialogDescription
 			this.Name = "TerraTechModManagerGTK.DialogDescription";
+			this.Icon = global::Gdk.Pixbuf.LoadFromResource("TerraTechModManagerGTK.Big TTMM Logo.png");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(4));
 			// Internal child TerraTechModManagerGTK.DialogDescription.VBox
 			global::Gtk.VBox w1 = this.VBox;
