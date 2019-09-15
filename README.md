@@ -1,4 +1,4 @@
-# [TerraTech-Mod-Manager-GTK](https://forum.terratechgame.com/index.php?threads/terratech-mod-manager.17208/)
+# [TerraTech Mod Manager](https://forum.terratechgame.com/index.php?threads/terratech-mod-manager.17208/)
 Recreation of a recreation of a mod manager for [TerraTech](https://terratechgame.com)
 
 ## Installing
