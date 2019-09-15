@@ -18,7 +18,7 @@ namespace TerraTechModManagerGTK
         public string CurrentVersion; //Json
 
         [JsonIgnore]
-        public int FoundOther;
+        public int FoundOther; // -1 = cannot find server pair; 1 = found pair
 
         [JsonIgnore]
         public ModState State;

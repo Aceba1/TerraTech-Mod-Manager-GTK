@@ -132,8 +132,10 @@ public partial class MainWindow : Gtk.Window
     {
         treeviewLocalMods.Selection.Changed += TreeView_SelectionChanged;
 
-        var SC = AddColumn("Active", treeviewLocalMods, new CellRendererToggle(), "active", 0);
-        SC.Clickable = true; SC.Clicked += StateColumn_Clicked;
+        var CellRenderer = new CellRendererToggle();
+        AddColumn("Active", treeviewLocalMods, CellRenderer, "active", 0);
+        CellRenderer.Activatable = true;
+        CellRenderer.Toggled += StateColumn_Clicked;
         AddColumn("Name", treeviewLocalMods, new CellRendererText(), "markup", 1);
         AddColumn("Description", treeviewLocalMods, new CellRendererText(), "text", 2);
         AddColumn("Author", treeviewLocalMods, new CellRendererText(), "text", 3);
@@ -147,8 +149,10 @@ public partial class MainWindow : Gtk.Window
 
         treeviewGithubMods.Selection.Changed += TreeView_SelectionChanged;
 
-        SC = AddColumn("Installed", treeviewGithubMods, new CellRendererToggle(), "active", 0);
-        SC.Clickable = true; SC.Clicked += StateColumn_Clicked;
+        var CellRenderer2 = new CellRendererToggle();
+        AddColumn("Installed", treeviewGithubMods, CellRenderer2, "active", 0);
+        CellRenderer2.Activatable = true;
+        CellRenderer2.Toggled += StateColumn_Clicked;
         AddColumn("Name", treeviewGithubMods, new CellRendererText(), "markup", 1);
         AddColumn("Description", treeviewGithubMods, new CellRendererText(), "text", 2);
         AddColumn("Author", treeviewGithubMods, new CellRendererText(), "text", 3);
@@ -243,9 +247,28 @@ public partial class MainWindow : Gtk.Window
         _dialogGithubToken = null;
     }
 
-    void StateColumn_Clicked(object sender, EventArgs e)
+    void StateColumn_Clicked(object sender, ToggledArgs args)
     {
         CurrentTreeView.Selection.GetSelected(out var iter);
+        Tools.invoke.Add(delegate { ToggleClicked(iter); });
+    }
+
+    void ToggleClicked(TreeIter supposedItem)
+    {
+        CurrentTreeView.Selection.GetSelected(out var iter);
+        if (supposedItem.Stamp != iter.Stamp) return;
+        var mod = GetModInfoFromIter(iter);
+        switch (mod.State)
+        {
+            case ModInfoHolder.ModState.Enabled: SetModState(mod, ModInfoHolder.ModState.Inactive); return;
+            case ModInfoHolder.ModState.Inactive: SetModState(mod, ModInfoHolder.ModState.Enabled); return;
+            default:
+                if (mod.FoundOther != 1)
+                {
+                    DownloadMod(mod, TabPagerMods.CurrentPage);
+                }
+                return;
+        }
     }
 
     private void TreeView_SelectionChanged(object sender, EventArgs e)
