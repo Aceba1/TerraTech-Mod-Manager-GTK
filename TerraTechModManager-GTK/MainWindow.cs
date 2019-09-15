@@ -124,7 +124,6 @@ public partial class MainWindow : Gtk.Window
         Column.AddAttribute(NewRenderer, Attribute, Index);
         return Column;
     }
-    //sudo write (Despacito) 
 
     private void SetupTree()
     {
