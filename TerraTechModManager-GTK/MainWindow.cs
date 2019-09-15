@@ -122,6 +122,9 @@ public partial class MainWindow : Gtk.Window
         TreeView.AppendColumn(Column);
         Column.PackStart(NewRenderer, true);
         Column.AddAttribute(NewRenderer, Attribute, Index);
+        Column.SortColumnId = Index;
+        Column.Clickable = true;
+        Column.SortIndicator = true;
         return Column;
     }
 
@@ -140,7 +143,7 @@ public partial class MainWindow : Gtk.Window
         treeviewLocalMods.Model = ModSortLocal;
 
         ModFilterLocal.VisibleFunc = new TreeModelFilterVisibleFunc(FilterTree);
-        ModSortLocal.DefaultSortFunc = new TreeIterCompareFunc(SortTree);
+        //ModSortLocal.DefaultSortFunc = new TreeIterCompareFunc(SortTree);
 
         treeviewGithubMods.Selection.Changed += TreeView_SelectionChanged;
 
@@ -155,7 +158,7 @@ public partial class MainWindow : Gtk.Window
         treeviewGithubMods.Model = ModSortGithub;
 
         ModFilterGithub.VisibleFunc = new TreeModelFilterVisibleFunc(FilterTree);
-        ModSortGithub.DefaultSortFunc = new TreeIterCompareFunc(SortTree);
+        //ModSortGithub.DefaultSortFunc = new TreeIterCompareFunc(SortTree);
     }
 
     private bool FilterTree(TreeModel treeModel, TreeIter iter)
@@ -166,11 +169,6 @@ public partial class MainWindow : Gtk.Window
         return ((string)treeModel.GetValue(iter, (int)TreeColumnInfo.Name)).ToLower().Contains(search) ||
             ((string)treeModel.GetValue(iter, (int)TreeColumnInfo.Author)).ToLower().Contains(search) ||
             ((string)treeModel.GetValue(iter, (int)TreeColumnInfo.Desc)).ToLower().Contains(search);
-    }
-
-    private int SortTree(TreeModel treeModel, TreeIter A, TreeIter B)
-    {
-        return 0;
     }
 
     TreeView CurrentTreeView
@@ -306,7 +304,7 @@ public partial class MainWindow : Gtk.Window
     {
         ModFilterGithub.Refilter();
         ModFilterLocal.Refilter();
-        Log("Refiltered");
+        //Log("Refiltered");
     }
 
     protected void ButtonSearchModsClicked(object sender, EventArgs e)
