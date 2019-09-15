@@ -138,6 +138,7 @@ If you have any problems, please contact the creator on the Github,  TerraTech F
 			this.DeleteEvent += new global::Gtk.DeleteEventHandler(this.OnDeleteEvent);
 			this.DestroyEvent += new global::Gtk.DestroyEventHandler(this.OnDestroyEvent);
 			this.buttonStart.Clicked += new global::System.EventHandler(this.OpenMain_Clicked);
+            this.entryFileSelect.Activated += new global::System.EventHandler(this.OpenMain_Clicked);
 		}
 	}
 }
