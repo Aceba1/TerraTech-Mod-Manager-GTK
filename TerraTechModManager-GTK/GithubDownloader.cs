@@ -243,6 +243,7 @@ namespace TerraTechModManagerGTK
 
             public static bool AddModDownload(ModInfoHolder ModBeingDownloaded, Gtk.ListStore ModStore)
             {
+                if (Downloads.Contains(ModBeingDownloaded)) return false;
                 ModDownloader.ModStore = ModStore;
                 List<ModInfoHolder> neededmods = new List<ModInfoHolder>();
                 foreach (var modname in ModBeingDownloaded.RequiredModNames)
