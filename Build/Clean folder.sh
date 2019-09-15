@@ -1,2 +1,6 @@
 #!/bin/sh
-rm -f TTMM/*config*&rm -f TTMM/*.pdb&rm -f TTMM/*.xml&echo Cleared
+
+rm TTMM/*config*
+rm TTMM/*.pdb
+rm TTMM/*.xml
+echo Cleared
