@@ -11,6 +11,7 @@ namespace TerraTechModManagerGTK
         public Start() : base(Gtk.WindowType.Toplevel)
         {
             Build();
+            buttonStart.GrabFocus();
             labelTip.Text = text_st;
             entryFileSelect.Text = Tools.TTRoot.Value;
             if (finished)
