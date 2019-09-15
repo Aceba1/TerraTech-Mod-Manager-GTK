@@ -408,6 +408,7 @@ public partial class MainWindow
 		this.TTMMForumPageAction.Activated += new global::System.EventHandler(this.OpenForumPage);
 		this.TTMMWikiPageAction.Activated += new global::System.EventHandler(this.OpenWikiPage);
 		this.entryModSearch.Activated += new global::System.EventHandler(this.EntryModSearchActivated);
+        this.entryModSearch.Changed += new global::System.EventHandler(this.EntryModSearchActivated);
 		this.buttonSearchMods.Clicked += new global::System.EventHandler(this.ButtonSearchModsClicked);
 		this.TabPagerMods.SwitchPage += new global::Gtk.SwitchPageHandler(this.TabChanged);
 		this.comboboxModState.Changed += new global::System.EventHandler(this.SetModState);
