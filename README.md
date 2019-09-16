@@ -1,4 +1,4 @@
-# TerraTech-Mod-Manager-GTK
+# [TerraTech Mod Manager](https://forum.terratechgame.com/index.php?threads/terratech-mod-manager.17208/)
 Recreation of a recreation of a mod manager for [TerraTech](https://terratechgame.com)
 
 ## Installing
@@ -10,4 +10,5 @@ This requires the mono runtime frameworks meant for your system. You can get tha
 
 ## Note
 
-- Currently MAC support is *still* being worked on...
+- Mac support has been added! (ver. [0.3.0](https://github.com/Aceba1/TerraTech-Mod-Manager-GTK/releases/tag/0.3.0))
+- Compiling on Linux VSCode produces an executable that does not function on Windows. Visual Studio Community is still necessary.
