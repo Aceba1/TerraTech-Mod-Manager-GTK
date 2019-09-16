@@ -578,18 +578,21 @@ public partial class MainWindow : Gtk.Window
 
     protected void UserInstallPatch(object sender, EventArgs e)
     {
+        if (string.IsNullOrEmpty(Patcher.PathToExe)) return;
         Patcher.RunByUser = true;
         Patcher.RunExe("-i");
     }
 
     protected void UserRemovePatch(object sender, EventArgs e)
     {
+        if (string.IsNullOrEmpty(Patcher.PathToExe)) return;
         Patcher.RunByUser = true;
         Patcher.RunExe("-u");
     }
 
     protected void UserUpdatePatch(object sender, EventArgs e)
     {
+        if (string.IsNullOrEmpty(Patcher.PathToExe)) return;
         KillPatcher();
         Patcher.RunByUser = false;
         ConfigHandler.SetValue("lastpatchversion", Tools.Version_Number);
@@ -598,6 +601,7 @@ public partial class MainWindow : Gtk.Window
 
     private void UpdatePatch()
     {
+        if (string.IsNullOrEmpty(Patcher.PathToExe)) return;
         Patcher.UpdatePatcher(System.IO.Path.Combine(ModInfoTools.DataFolder, "Managed"));
         Patcher.RunExe("-u");
         Patcher.IsReinstalling = true;
