@@ -32,7 +32,7 @@ namespace TerraTechModManagerGTK
             Process patcher = new Process();
             patcher.StartInfo.WorkingDirectory = Tools.IsLinux ? null : Path.Combine(PathToExe, @"../");
             patcher.StartInfo.FileName = Tools.IsLinux ? "/bin/bash" : PathToExe;
-            patcher.StartInfo.Arguments = Tools.IsLinux ? $" -c \"cd '{System.IO.Directory.GetParent(PathToExe)}' && mono '{PathToExe}' {args}\"" : args;
+            patcher.StartInfo.Arguments = Tools.IsLinux ? $" -c \"cd '{System.IO.Directory.GetParent(PathToExe)}' && {(Tools.IsMacOSX?Tools.MonoMacOSX:"mono")} '{PathToExe}' {args}\"" : args;
 
             patcher.StartInfo.UseShellExecute = false;
             patcher.StartInfo.RedirectStandardOutput = true;

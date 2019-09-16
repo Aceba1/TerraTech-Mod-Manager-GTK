@@ -58,7 +58,7 @@ namespace TerraTechModManagerGTK
                     $"rm -r {downloadPath}" +
                     $"echo Done!&&" +
                     $"sleep 5s&&" +
-                    $"mono '{executable}'\"";
+                    $"{(Tools.IsMacOSX ? Tools.MonoMacOSX : "mono")} '{executable}'\"";
                 startInfo.CreateNoWindow = false;
             }
             else
@@ -71,7 +71,7 @@ namespace TerraTechModManagerGTK
                     $"del /q {downloadPath}&" +
                     $"echo Done!&" +
                     $"timeout 5&" +
-                    $"start \"ttmm2\" \"{executable}\"";
+                    $"start \"ttmmgtk\" \"{executable}\"";
             }
             process.StartInfo = startInfo;
             process.Start();

@@ -105,6 +105,8 @@ namespace TerraTechModManagerGTK
         }
         public static bool IsMacOSX { get; set; }
 
+        public const string MonoMacOSX = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono";
+
         public static bool AllowedToRun { get; set; } = true;
 
         private static string GetUniqueRootPath()
