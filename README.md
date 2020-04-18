@@ -15,7 +15,7 @@ This requires the mono runtime frameworks meant for your system. **You can get t
 - Mac support has been added! (ver. [0.3.0](https://github.com/Aceba1/TerraTech-Mod-Manager-GTK/releases/tag/0.3.0))
 - Compiling through Monodevelop might produce an executable that does not function on Windows. Visual Studio Community is still necessary.
 
-- I might try to make a new version next decade in C++
+- ~~I might try to make a new version next decade in C++~~ It appears that the developers are (finally) working towards official mod support, meaning TTMM may be left behind or integrated.
 
 ---
 
