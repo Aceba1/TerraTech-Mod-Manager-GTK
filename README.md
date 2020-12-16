@@ -1,5 +1,5 @@
 # [TerraTech Mod Manager](https://forum.terratechgame.com/index.php?threads/terratech-mod-manager.17208/)
-Recreation of a mod manager for [TerraTech](https://terratechgame.com)
+Recreation of my mod manager for [TerraTech](https://terratechgame.com)
 
 ## Installing
 [Most-recent release](https://github.com/Aceba1/TerraTech-Mod-Manager-GTK/releases/latest)
