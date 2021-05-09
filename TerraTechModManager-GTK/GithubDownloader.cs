@@ -39,15 +39,19 @@ namespace TerraTechModManagerGTK
                 get => Counted < TotalCount;
             }
 
+            public static string SearchReposURL(string search, double page = 0) => "https://api.github.com/search/repositories" +
+                $"?per_page=100&page:{page}&q=topic:ttqmm{(string.IsNullOrEmpty(search) ? "" : "+" + search)}";
+
+
             public static GithubRepoItem GetOneRepo(string CloudName)
             {
                 return WebClientHandler.DeserializeApiCall<GithubRepoItem>("https://api.github.com/repos/" + CloudName);
             }
 
-            public static GithubRepoItem[] GetFirstPage(string Search = "")
+            public static GithubRepoItem[] GetFirstPage(string search = "")
             {
-                GetRepos.Search = Uri.EscapeUriString(Search);
-                var repos = WebClientHandler.DeserializeApiCall<GithubRepos>("https://api.github.com/search/repositories?q=topic:ttqmm" + (GetRepos.Search != "" ? "+" + Search : ""));
+                Search = Uri.EscapeUriString(search);
+                var repos = WebClientHandler.DeserializeApiCall<GithubRepos>(SearchReposURL(Search));
                 Counted = repos.items.Length;
                 Page = 0;
                 TotalCount = repos.total_count;
@@ -57,7 +61,7 @@ namespace TerraTechModManagerGTK
             public static GithubRepoItem[] GetNextPage()
             {
                 Page++;
-                var repos = WebClientHandler.DeserializeApiCall<GithubRepos>("https://api.github.com/search/repositories?q=topic:ttqmm" + (Search != "" ? "+" + Search : "") + "&page:" + Page.ToString());
+                var repos = WebClientHandler.DeserializeApiCall<GithubRepos>(SearchReposURL(Search, Page));
                 Counted += repos.items.Length;
                 if (TotalCount != repos.total_count)
                 {
@@ -82,12 +86,6 @@ namespace TerraTechModManagerGTK
                 public string pushed_at;
             }
         }
-
-
-        //https://api.github.com/search/repositories?q=topic:ttqmm
-        //https://api.github.com/search/repositories?q=topic:ttqmm&page:0
-
-
 
         public static class DownloadFolder
         {
